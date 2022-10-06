@@ -1,0 +1,193 @@
+<HTML>
+
+	<HEAD><TITLE>Chisel Requests</TITLE></HEAD>
+
+	<body>
+		<h1>Chisel Requests</h1>
+		<p><i>Last updated: 13 April 2006</i></p>
+		<h2>Requests since 2.1 "HVRC Edition" was released</h2>
+		<p>Developers interested in contributing are recommended to choose a topic from the list below before considering items in the archived list. Contact michael.louka@hrp.no before starting though, to make sure that someone is not already working on the request you are interested in!</p>
+ 
+ <pre>
+    Req 1: X3D Binary export
+    
+    Req 2: Add option to show line numbers in edit window
+    
+    Req 3: Chisel needs exit codes when run from command line (or does it have these already?)
+ 
+    Req 4: Ability to center, scale, transpose coordinates
+    
+    Req 5: Title bar of Chisel application should change when loading new file
+    
+    Req 6: Nested Transform collapser
+           (for unnamed transforms only)
+    
+    Req 7: Scene graph overview option
+          (show scene graph as a tree to aid navigation in the code)
+    
+    Req 8: Filename in window title bar should indicate if file is changed but not saved
+
+    Req 9: Elevation grid splitter needs grouping and LODing options
+
+    Req 10: Need easy way to switch between multiple open files and view summary info
+
+    Req 11: Constrained Delaunay triangulator
+
+    Req 12: Restructure to enable &quot;Chisel&quot; to be more easily used as a Java library
+            (split into chisel-core &amp; chisel-gui jars and provide a clean public API to chisel-core)
+            Can base on the clvorlon &amp; clchisel code.
+
+    Req 13: Remove use of HTML reports for configuration
+            (use XML instead and strip out the HTML parsing code)</pre>
+		
+		<hr>
+		<h2>Archived Requests</h2>
+		<p>Requests from before 2006 were registered as bugs, but have now been archived below to make the list of genuine bugs easier to work with. Those with number in square brackets after the bug number have been assigned new request numbers. Those that have not been reasigned have been judged unlikely to be implemented in the foreseeable future. Of course, items that have not been assigned new request numbers can be promoted if there is enough interest in them or if a developer wishes to contribute a solution for one of these to the codebase.</p>
+		<pre>
+    Bug 26: undo doesn't undo save as name...
+
+    Bug 36: Some chisels can run at same time (separate phases not always necessary)
+
+    Bug 42: ShapeColorSplitter won't color split by color node alone, needs index values
+
+    Bug 44: ROUTE mover should move to end of PROTO if bad ROUTEs are in a PROTO
+
+    Bug 48: Make smart number resolution adjuster, flag controls whether or not nearest neighbor taken into account
+
+    Bug 54: add option to show Triangle count rather than polygon count
+
+    Bug 58: VALIDATE needs an option to validate existence of referenced urls
+
+    Bug 59: add a fetch option to not write over existing files on the fetch
+
+    Bug 62: file loading should have option of loading referenced wrl files
+
+    Bug 65: MUTATE category should show count of IFS (or somehow show what it operates on)
+
+    Bug 78: scrolling slow
+
+    Bug 80: stop during polygon reduction doesn't stop immediately
+    
+    Bug 93: [2] add option to show line numbers in edit window
+
+    Bug 95: horizontal and vertical scroll markers should be proportional to available text
+
+    Bug 101: inline to externproto w/ proto for ROUTE handling
+
+    Bug 105: fetch should leave dialog open and use it to provide feedback
+
+    Bug 124: IS field disables verify of a node within a PROTO, too strict
+
+    Bug 135: html report should include button category pressed
+
+    Bug 139: reducing IFS with texture, have to adjust texture coordinates
+
+    Bug 144: mutator grill, puts grids on faces, x dim, ydim
+
+    Bug 145: missing wireframe &amp; point cloud tests without default field value removal
+
+    Bug 146: need a wizard to set up recommended settings for a file
+
+    Bug 147: need &quot;-clean&quot; command line option on chisel 
+
+    Bug 149: need to be able to customize built in Chisel categories
+
+    Bug 150: [3] chisel needs exit codes when run from command line (or does it have these already?)
+
+    Bug 152: reducer category, entries should be radio buttons, not checkboxes
+
+    Bug 153: have way to view history (html report like)
+
+    Bug 155: fetch needs better feedback, can't tell if it is hung accessing slow sites
+
+    Bug 161: chisel to report min/max xyz of each Shape
+
+    Bug 162: replace face defined primitives with actual primitives
+
+    Bug 163: [4] ability to center, scale, transpose coordinates
+
+    Bug 167: split nonconforming shapes so that they do conform
+
+    Bug 171: uninline should include bboxSize, bboxCenter for all geometry nodes not just coord containers
+
+    Bug 176: add gzip statistic to html report
+
+    Bug 177: add original and final file sizes to html report
+
+    Bug 183: [5] title bar of chisel application should change when loading new file
+
+    Bug 195: automatic compression html report for each command line file processed
+
+    Bug 196: html report option to include number &amp; type of errors while processing
+
+    Bug 197: [6] need nested transform collapser
+
+    Bug 198: need to remove unnecessary &quot;convex FALSE&quot; fields
+
+    Bug 199: fetch needs customizable extensions to not fetch (e.g. &quot;.exe&quot;)
+
+    Bug 200: command line chisel should save errors if any (warnings, DEF warnings optional)
+
+    Bug 201: some chisels can skip traversal if error message saves location of errors they use
+
+    Bug 202: Turn Shapes into Inlines should show count of Shape nodes
+
+    Bug 205: unEXTERNPROTO chisel
+
+    Bug 209: non-consecutive repeated coordIndex values need different error
+
+    Bug 210: non-consecutive repeated coordIndex of type A-B-A, can remove &quot;B-A&quot;
+
+    Bug 216: option to automatically clean after loading
+
+    Bug 220: make editor functional and faster
+
+    Bug 221: [7] scene graph viewing option
+
+    Bug 222: interpolator frame rate reducer chisel
+
+    Bug 223: chisel to build bounding box proximity nodes, with hide/reveal script option
+
+    Bug 230: remove material node chisel needs access to material node count
+
+    Bug 238: fetch should have option to exclude files by size, i.e. max download size settable
+
+    Bug 240: small tri slivers into colored lines
+
+    Bug 241: small tri too big
+
+    Bug 244: [8] file name should give indication it is changed but not saved &quot;*&quot;
+
+    Bug 246: need chisel to make face sense identical and remove &quot;solid FALSE&quot;
+
+    Bug 247: need better message when nothing checked off in category, button pressed
+
+    Bug 249: chisel does not remove duplicate ROUTEs
+
+    Bug 262: need chisel to thin out elevation grids
+
+    Bug 263: need automatic upgrade option while online (rename old jar, download new if necessary)
+
+    Bug 264: include test world with chisel and vorlon distribution
+
+    Bug 266: elevation grid splitter needs to label grids
+
+    Bug 267: [9] elevation grid splitter needs grouping options
+
+    Bug 279: [10] when multiple files open need easy way to switch between them and have summary info
+
+    Bug 278: colors of options and unlock windows not right on NT (ok on win95)
+
+    Bug 286: add humanoid 1.1 compliance check
+
+    Bug 301: IFS to EV mutator
+
+    Bug 302: [11] Constrained Delaunay triangulator
+
+    Bug 311: fetch needs &quot;retrieve directly referenced files&quot; option (eg to get JPG in html page, but not zillion links)
+
+    Bug 323: ability to start Chisel to a particular directory
+</pre>
+	</body>
+
+</HTML>

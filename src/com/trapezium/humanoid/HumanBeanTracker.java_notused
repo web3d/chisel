@@ -1,0 +1,161 @@
+package com.trapezium.humanoid;
+
+import java.awt.*;
+import java.util.*;
+import com.trapezium.bean.*;
+
+public class HumanBeanTracker {
+    java.awt.Checkbox[] humanoids;
+    java.awt.Checkbox[] behaviors;
+    HumanBean[] theHumanBeans;
+    BehaviorBean[] theBehaviorBeans;
+    BitSet[] behaviorMarkers;
+    int maxHumanoids;
+    int maxBehaviors;
+    int hidx;
+    int bidx;
+   	int currentBean;
+    HumanBeanTracker() {
+        currentBean = -1;
+        hidx = 0;
+        bidx = 0;
+        maxHumanoids = 9;
+        maxBehaviors = 14;
+        humanoids = new java.awt.Checkbox[maxHumanoids];
+        behaviors = new java.awt.Checkbox[maxBehaviors];
+        theHumanBeans = new HumanBean[maxHumanoids];
+        theBehaviorBeans = new BehaviorBean[maxBehaviors];
+        behaviorMarkers = new BitSet[maxHumanoids];
+    }
+    
+    int getNumberHumanoids() {
+        int count = 0;
+        for ( int i = 0; i < maxHumanoids; i++ ) {
+            if ( theHumanBeans[i] != null ) {
+                count++;
+            }
+        }
+        return( count );
+    }
+    
+    int getNumberBehaviors() {
+        int count = 0; 
+        for ( int i = 0; i < maxBehaviors; i++ ) {
+            if ( theBehaviorBeans[i] != null ) {
+                count++;
+            }
+        }
+        return( count );
+    }
+    
+    
+    void addCheckboxH( java.awt.Checkbox b ) {
+        humanoids[hidx] = b;
+        hidx++;
+    }
+    void addCheckboxB( java.awt.Checkbox b ) {
+        behaviors[bidx] = b;
+        bidx++;
+    }
+    void updateHumanoidSelection( Object checkbox ) {
+        if ( checkbox instanceof java.awt.Checkbox ) {
+            java.awt.Checkbox x = (java.awt.Checkbox)checkbox;
+            if ( !x.getState() ) {
+                return;
+            }
+            for ( int i = 0; i < maxHumanoids; i++ ) {
+                if ( humanoids[i] == checkbox ) {
+                    currentBean = i;
+                    updateBehaviors();
+                    return;
+                }
+            }
+        }
+    }
+                    
+    void updateBehaviorSelection( Object checkbox ) {
+        if ( currentBean == -1 ) {
+            return;
+        }
+        if ( checkbox instanceof java.awt.Checkbox ) {
+            for ( int i = 0; i < maxBehaviors; i++ ) {
+                if ( behaviors[i] == checkbox ) {
+                    if ( behaviors[i].getState() ) {
+                        behaviorMarkers[currentBean].set(i);
+                        theHumanBeans[currentBean].activateBehavior(theBehaviorBeans[i]);
+                    } else {
+                        behaviorMarkers[currentBean].clear(i);
+                        theHumanBeans[currentBean].deactivateBehavior(theBehaviorBeans[i]);
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    final String AvailableIndicator = "(available)";
+   	void saveBean( HumanBean theBean ) {
+        String beanName = theBean.getName();
+   	    System.out.println( "Saving bean " + beanName );
+   	    for ( int i = 0; i < maxHumanoids; i++ ) {
+   	        String test = humanoids[i].getLabel();
+   	        if ( test.compareTo( AvailableIndicator ) == 0 ) {
+   	            System.out.println( "saved bean at " + i );
+   	            humanoids[i].setLabel( beanName );
+   	            theHumanBeans[i] = theBean;
+   	            humanoids[i].setState( true );
+   	            behaviorMarkers[i] = new BitSet( maxBehaviors );
+   	            currentBean = i;
+   	            return;
+   	        }
+ 	    }
+    }
+    
+    void saveBehaviors( HumanBean theBean ) {
+        String beanName = theBean.getName();
+        int numberBehaviors = theBean.getNumberBehaviors();
+        System.out.println( "the bean has " + numberBehaviors + " behaviors" );
+        for ( int i = 0; i < numberBehaviors; i++ ) {
+            saveBehavior( beanName + " b" + i, theBean.getBehaviorAt( i ));
+        }
+    }
+    
+    void saveBehavior( String behaviorName, BehaviorBean bb ) {
+        for ( int i = 0; i < maxBehaviors; i++ ) {
+            String test = behaviors[i].getLabel();
+            if ( test.compareTo( AvailableIndicator ) == 0 ) {
+                System.out.println( "saved behavior at " + i );
+                behaviors[i].setLabel( behaviorName );
+                theBehaviorBeans[i] = bb;
+                behaviorMarkers[currentBean].set( i );
+                return;
+            }
+        }
+    }
+    
+    void updateBehaviors() {
+        for ( int i = 0; i < maxBehaviors; i++ ) {
+            behaviors[i].setState( behaviorMarkers[ currentBean ].get( i ));
+        }
+    }
+    
+    void saveHumanoidVRML() {
+        if ( currentBean != -1 ) {
+            String genName = theHumanBeans[ currentBean ].generateVrmlFileName();
+            System.out.println( "Saving '" + genName + "'" );
+            theHumanBeans[ currentBean ].generateVRML( genName );
+            genName = theHumanBeans[ currentBean ].generateXmlFileName();
+            System.out.println( "Saving '" + genName + "'" );
+            theHumanBeans[ currentBean ].generateXML( genName );
+            System.out.println( "Done." );
+        }
+    }
+    
+    public String getSaveName() {
+        if ( currentBean != -1 ) {
+            return( theHumanBeans[ currentBean ].generateVrmlFileName() );
+        } else {
+            return( null );
+        }
+    }
+}

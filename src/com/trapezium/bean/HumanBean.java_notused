@@ -1,0 +1,676 @@
+/*
+ * @(#)HumanBean.java
+ *
+ * Copyright (c) 1999 by Trapezium Development LLC.  All Rights Reserved.
+ *
+ * The information in this file is the property of Trapezium Development LLC
+ * and may be used only in accordance with the terms of the license granted
+ * by Trapezium.
+ *
+ */
+package com.trapezium.bean;
+
+import com.trapezium.parse.TokenEnumerator;
+import com.trapezium.humanoid.Humanoid_1_0;
+import com.trapezium.humanoid.HumanoidJointInfo;
+import com.trapezium.vrml.ROUTE;
+import com.trapezium.vrml.Scene;
+import com.trapezium.vrml.node.DEFUSENode;
+import com.trapezium.vrml.node.PROTOInstance;
+import com.trapezium.vrml.node.PROTObase;
+
+import vrml.external.Node;
+
+import java.io.*;
+import java.util.Hashtable;
+import java.util.Enumeration;
+import java.util.Vector;
+import java.util.BitSet;
+
+public class HumanBean implements java.io.Serializable, Humanoid_1_0 {
+
+    TokenEnumerator humanoidTokenEnumerator;
+    TokenEnumerator humanoidRootTokenEnumerator;
+    vrml.external.Node[] humanNodes;
+    
+    // key joint name, value DEF name
+    Hashtable jointToDef;
+    
+    // key DEF name, value joint name
+    Hashtable defToJoint;
+    Vector routes;
+    String sourceFile;
+    String sourceUrl;
+    Scene scene;
+    
+    // List of HumanBeanBehaviors, really just a BehaviorBean and activated flag
+    // so we can enable BehaviorBean as it applies to a particular HumanBean
+    Vector behaviors;
+
+    /** Class constructor */
+    public HumanBean( String inFile, Scene scene ) {
+        sourceUrl = inFile;
+        File f = new File( inFile );
+        this.sourceFile = f.getName();
+        int dotIdx = sourceFile.indexOf( '.' );
+        if ( dotIdx > 0 ) {
+            sourceFile = sourceFile.substring( 0, dotIdx );
+        }
+        this.scene = scene;
+        humanNodes = new vrml.external.Node[Humanoid_1_0.NumberJoints];
+        jointToDef = new Hashtable();
+        defToJoint = new Hashtable();
+        routes = new Vector();
+    }
+        
+    /** Get the Scene the HumanBean was extracted from */
+    public Scene getScene() {
+        return( scene );
+    }
+    
+    /** Get the name of the HumanBean, for now just use sourceURL */
+    public String getName() {
+        return( sourceUrl );
+    }
+
+    /** generate name for the "wrl" file */
+    public String generateVrmlFileName() {
+        String s = sourceUrl;
+        if ( s.lastIndexOf( '/' ) != -1 ) {
+            s = s.substring( s.lastIndexOf( '/' ));
+        }
+        if ( s.lastIndexOf( '\\' ) != -1 ) {
+            s = s.substring( s.lastIndexOf( '\\' ));
+        }
+        if ( s.lastIndexOf( '.' ) != -1 ) {
+            s = s.substring( 0, s.lastIndexOf( '.' ));
+        }
+        return( s + "_bean.wrl" );
+    }
+
+    /** generate name for the "xml" file */
+    public String generateXmlFileName() {
+        String s = sourceUrl;
+        if ( s.lastIndexOf( '/' ) != -1 ) {
+            s = s.substring( s.lastIndexOf( '/' ));
+        }
+        if ( s.lastIndexOf( '\\' ) != -1 ) {
+            s = s.substring( s.lastIndexOf( '\\' ));
+        }
+        if ( s.lastIndexOf( '.' ) != -1 ) {
+            s = s.substring( 0, s.lastIndexOf( '.' ));
+        }
+        return( s + "_bean.xml" );
+    }
+    
+    /** Methods used for extracting a humanoid from a VRML file.  
+     *
+     *  Humanoid sections of the file are placed in two TokenEnumerators.
+     *  One is for the HumanoidRoot, the other for the Humanoid itself.
+     */
+    
+    /** Get the TokenEnumerator used to hold the Humanoid */
+    public TokenEnumerator getHumanoidTokenEnumerator() {
+        createHumanoidTokenEnumerator();
+        return( humanoidTokenEnumerator );
+    }
+    
+    /** Get the TokenEnumerator used to hold the HumanoidRoot (this is the main body) */
+    public TokenEnumerator getHumanoidRootTokenEnumerator() {
+        createHumanoidRootTokenEnumerator();
+        return( humanoidRootTokenEnumerator );
+    }
+    
+    void createHumanoidTokenEnumerator() {
+        if ( humanoidTokenEnumerator == null ) {
+            humanoidTokenEnumerator = new TokenEnumerator();
+        }
+    }
+    
+    void createHumanoidRootTokenEnumerator() {
+        if ( humanoidRootTokenEnumerator == null ) {
+            humanoidRootTokenEnumerator = new TokenEnumerator();
+        }
+    }
+    
+    /** Create an association between the DEF name of a joint in a file, and
+     *  the actual joint name.  This can later be used by EAI to look up the 
+     *  DEF name for a joint then modify the angles.
+     */
+    public void associate( String defName, String jointName ) {
+        System.out.println( "DEF to joint " + defName + " to " + jointName );
+        defToJoint.put( defName, jointName );
+        jointToDef.put( jointName, defName );
+    }
+    
+    /** Get the mapping between Joint and DEF names */
+    public Hashtable getJointToDef() {
+        return( jointToDef );
+    }
+    
+    /** Save ROUTE info. */
+    public void saveROUTE( ROUTE route ) {
+        routes.addElement( route );
+    }
+    private void writeObject( ObjectOutputStream stream ) throws java.io.IOException  {
+        System.out.println( "HumanBean.writeObject" );
+        stream.defaultWriteObject();
+    }
+    
+    /** serialize the Human Bean */
+    public void serialize() {
+        String fileName = sourceFile; // (String)jointToDef.get( "HumanoidRoot" );
+        if ( fileName == null ) {
+            fileName = "human.bean";
+        } else {
+            fileName = fileName + ".bean";
+        }
+        File f = new File( fileName );
+        try {
+            FileOutputStream fos = new FileOutputStream( f );
+            ObjectOutputStream oos = new ObjectOutputStream( fos );
+            oos.writeObject( this );
+            fos.flush();
+            fos.close();
+        } catch ( Exception e ) {
+            System.out.println( "** Exception " + e );
+            e.printStackTrace();
+        }
+/*        Enumeration defEnumerator = defToJoint.keys();
+        while ( defEnumerator.hasMoreElements() ) {
+            String defName = (String)defEnumerator.nextElement();
+            String jointName = (String)defToJoint.get( defName );
+            System.out.println( "DEF " + defName + " is " + jointName );
+        }*/
+        System.out.println( "Saved humanoid in '" + fileName + "'" );
+    }
+
+    /** Load a serialized HumanBean.
+     *
+     *  @param fileName name of file to load
+     */
+    static public HumanBean load( String fileName ) throws Exception {
+        try {
+            File f = new File( fileName );
+            FileInputStream fis = new FileInputStream( f );
+            ObjectInputStream ois = new ObjectInputStream( fis );
+            HumanBean result = (HumanBean)ois.readObject();
+            return( result );
+        } catch ( Exception e ) {
+            System.out.println( "** Exception " + e );
+            e.printStackTrace();
+            throw( e );
+//            return( null );
+        }
+    }
+
+    /** Generate VRML text for this HumanBean and its associated behaviors */
+    public void generateVRML( String fileName ) {
+        try {
+            File f = new File( fileName );
+            FileOutputStream fos = new FileOutputStream( f );
+            PrintStream ps = new PrintStream( fos );
+            ps.println( "#VRML V2.0 utf8" );
+            ps.println( "" );
+            ps.println( "# Standard Humanoid Animation 1.0 PROTOs" );
+            ps.println( "PROTO Joint [" );
+            ps.println( "exposedField SFString name \"\"" );
+            ps.println( "exposedField SFVec3f translation 0 0 0" );
+            ps.println( "exposedField SFRotation rotation 0 0 1  0" );
+            ps.println( "exposedField SFVec3f scale 1 1 1" );
+            ps.println( "exposedField SFRotation scaleOrientation 0 0 1  0" );
+            ps.println( "exposedField SFVec3f center 0 0 0" );
+            ps.println( "exposedField MFNode children [  ]" );
+            ps.println( "exposedField MFFloat ulimit [ 0, 0, 0 ]" );
+            ps.println( "exposedField MFFloat llimit [ 0, 0, 0 ]" );
+            ps.println( "]" );
+            ps.println( "{" );
+ps.println("  Transform {" );
+ps.println("    children IS children" );
+ps.println("    translation IS translation" );
+ps.println("    rotation IS rotation" );
+ps.println("    scale IS scale" );
+ps.println("    scaleOrientation IS scaleOrientation" );
+ps.println("    center IS center" );
+ps.println("  }" );
+ps.println("}" );
+ps.println("PROTO Segment [" );
+ps.println("  exposedField SFString name \"\"" );
+ps.println("  exposedField SFFloat mass 0" );
+ps.println("  exposedField SFVec3f centerOfMass 0 0 0" );
+ps.println("  exposedField SFVec3f bboxCenter 0 0 0" );
+ps.println("  exposedField SFVec3f bboxSize -1 -1 -1" );
+ps.println("  exposedField MFNode children [  ]" );
+ps.println("]" );
+ps.println("{" );
+ps.println("  Group {" );
+ps.println("    children IS children" );
+ps.println("  }" );
+ps.println("}" );
+ps.println("PROTO Humanoid [" );
+ps.println("  exposedField	SFString version \"1.0\"" );
+ps.println("  field		SFString name \"\"" );
+ps.println("  field		MFString info [  ]" );
+ps.println("  exposedField	MFNode joints [  ]" );
+ps.println("  exposedField	MFNode segments [  ]" );
+ps.println("  field		SFVec3f bboxCenter 0 0 0" );
+ps.println("  field		SFVec3f bboxSize -1 -1 -1" );
+ps.println("]" );
+ps.println("{" );
+ps.println("  WorldInfo {" );
+ps.println("    title	IS	name" );
+ps.println("    info	IS	info" );
+ps.println("  }" );
+ps.println("}" );
+
+            ps.println( "#" );
+            ps.println( "# extracted by Trapezium Human Bean" );
+            ps.println( "#" );
+            ps.println( "# the HumanoidRoot" );
+            ps.println( "" );
+            if ( humanoidRootTokenEnumerator != null ) {
+                humanoidRootTokenEnumerator.saveLines( ps );
+            }
+            ps.println( "" );
+            ps.println( "# the Humanoid" );
+            ps.println( "" );
+            if ( humanoidTokenEnumerator != null ) {
+                humanoidTokenEnumerator.saveLines( ps );
+            }
+            analyzeBehaviors();
+            generateBehavior( ps );
+        } catch ( Exception e ) {
+            System.out.println( "Exception: " + e );
+            e.printStackTrace();
+        }
+    }
+    
+    /** Generate XML text for this HumanBean and its associated behaviors */
+    public void generateXML( String fileName ) {
+        try {
+            File f = new File( fileName );
+            FileOutputStream fos = new FileOutputStream( f );
+            PrintStream ps = new PrintStream( fos );
+            ps.println( "<?xml version=\"1.0\">" );
+            ps.println( "<humanoid>" );
+            Enumeration k = jointToDef.keys();
+            while ( k.hasMoreElements() ) {
+                String jointName = (String)k.nextElement();
+                String DEFname = (String)jointToDef.get( jointName );
+                ps.println( " <Joint>" );
+                ps.println( "  <name>" + jointName + "</name>" );
+                ps.println( "  <defname>" + DEFname + "</defname>" );
+                String swingMark = HumanoidJointInfo.getSwingMark( jointName );
+                if ( swingMark != null ) {
+                    ps.println( "  <swing>" + swingMark + "</swing>" );
+                }
+                ps.println( " </Joint>" );
+            }
+            ps.println( "</humanoid>" );
+        } catch ( Exception e ) {
+            System.out.println( "Exception: " + e );
+            e.printStackTrace();
+        }
+    }
+ 
+    
+    /** The HumanBeanBehavior is just a BehaviorBean and an "activated" flag.
+     *  This is used to activate BehaviorBean for a particular HumanBean.
+     *  For example, a BehaviorBean can be taken from a different HumanBean,
+     *  and placed in this HumanBean and activated.  This allows the behavior
+     *  VRML text to be regenerated.
+     */
+    class HumanBeanBehavior implements java.io.Serializable {
+        boolean activated;
+        BehaviorBean bb;
+
+        /** Class constructor, by default all HumanBeanBehaviors are activated */
+        HumanBeanBehavior( BehaviorBean bb ) {
+            this.bb = bb;
+            activated = true;
+        }
+        
+        /** Get the raw BehaviorBean */
+        public BehaviorBean getBehaviorBean() {
+            return( bb );
+        }
+
+        /** Generate VRML text for a BehaviorBean if it is activated.
+         *
+         *  @param humanBean the HumanBean whose Joints are going to be modified by the behavior
+         *  @param printStream print destinatino
+         *  @param behaviorNumber used to give standard name to behavior in DEF & ROUTEs
+         *  @param defsGenerated table of all DEF text generated, needed for when different
+         *     behaviors share DEFs
+         *  @param routesGenerated list of all ROUTEs that have been converted to text to prevent
+         *     duplicate ROUTE generation
+         */
+        boolean generateVRML( HumanBean humanBean, PrintStream printStream, int behaviorNumber, Hashtable defsGenerated, Vector routesGenerated, Hashtable protosGenerated ) {
+            if ( activated ) {
+                bb.generateVRML( humanBean, printStream, behaviorNumber, defsGenerated, routesGenerated, protosGenerated );
+            }
+            return( activated );
+        }
+        
+        /** Disable the HumanBeanBehavior */
+        void deactivate() {
+            activated = false;
+        }
+        
+        /** Enable the HumanBeanBehavior */
+        void activate() {
+            activated = true;
+        }
+    }
+
+    /** Generate VRML text for behaviors associated with this HumanBean */
+    public void generateBehavior( PrintStream ps ) {
+        int numberBehaviors = getNumberBehaviors();
+        Hashtable defsGenerated = new Hashtable();
+        Hashtable protosGenerated = new Hashtable();
+        Vector routesGenerated = new Vector();
+        int nextBehaviorNumber = 0;
+        for ( int i = 0; i < numberBehaviors; i++ ) {
+            HumanBeanBehavior hbb = (HumanBeanBehavior)behaviors.elementAt( i );
+            if ( hbb.generateVRML( this, ps, nextBehaviorNumber, defsGenerated, routesGenerated, protosGenerated )) {
+                nextBehaviorNumber++;
+            }
+        }
+    }
+
+    /** Get the number of behaviors associated with this bean */
+    public int getNumberBehaviors() {
+        if ( behaviors == null ) {
+            return( 0 );
+        } else {
+            return( behaviors.size() );
+        }
+    }
+    
+    /** Get a particular behavior */
+    public BehaviorBean getBehaviorAt( int offset ) {
+        if ( offset < behaviors.size() ) {
+            HumanBeanBehavior hbb = (HumanBeanBehavior)behaviors.elementAt( offset );
+            return( hbb.getBehaviorBean() );
+        } else {
+            return( null );
+        }
+    }
+    
+    /** Get the number of ROUTEs associated with all behaviors for this bean */
+    int getNumberRoutes() {
+        return( routes.size() );
+    }
+    
+    /** Create a set of BehaviorBean objects.  This is done in
+     *  many phases:
+     *    Phase 1:  identify all ROUTEs that refer to a humanoid joint,
+     *       and all the DEFs used by those ROUTEs.
+     *    Phase 2:  find all ROUTEs and DEFs that directly or indirectly use
+     *       the DEFs found in phase 1.  This gives a complete set of ROUTEs
+     *       for all behaviors in the file.
+     *    Phase 3:  break ROUTEs and DEFs into separate groups, using the
+     *       following algorithm:
+     *
+     *         a) select any ROUTE not associated with a behavior
+     *         b) mark it as associated with a behavior
+     *         c) select any ROUTE that sends to the source object,
+     *            if none found, we are done, the ROUTE is the behavior root.
+     *            If any is found, repeat steps a), b), c).
+     */
+    boolean analyzed = false;
+    public void analyzeBehaviors() {
+        if ( analyzed ) {
+            return;
+        }
+        analyzed = true;
+        int numberRoutes = routes.size();
+        if ( numberRoutes == 0 ) {
+            return;
+        }
+        
+        // Phase 1:  identify all ROUTEs using humanoid Joints
+        // the humanoidRouteDEFs tracks all DEFs used by all ROUTEs that
+        // refer directly to a humanoid Joint.
+        Hashtable humanoidRouteDEFs = new Hashtable();
+
+        // the humanoidRoutes BitSet marks each ROUTE that refers directly
+        // to a humanoid Joint.
+        BitSet humanoidRoutes = new BitSet( numberRoutes );
+//        System.out.println( "Marking all ROUTES that refer directly to humanoid Joint" );
+        for ( int i = 0; i < numberRoutes; i++ ) {
+            ROUTE test = (ROUTE)routes.elementAt( i );
+            String routeSourceDEF = test.getSourceDEFname();
+            String routeDestDEF = test.getDestDEFname();
+            if (( routeSourceDEF != null ) && ( routeDestDEF != null )) {
+                if ( defToJoint.get( routeSourceDEF ) != null ) {
+//                    System.out.println( "Route " + i + " refers to Humanoid Joint" );
+                    humanoidRouteDEFs.put( routeSourceDEF, routeSourceDEF );
+                    humanoidRoutes.set( i );
+                } else if ( defToJoint.get( routeDestDEF ) != null ) {
+//                    System.out.println( "Route " + i + " refers to Humanoid Joint" );
+                    humanoidRouteDEFs.put( routeSourceDEF, routeSourceDEF );
+                    humanoidRoutes.set( i );
+                } else {
+//                    System.out.println( "Route " + i + " does NOT refer to Humanoid Joint" );
+                }
+            }
+        }
+        //  Phase 2: identify all ROUTEs and DEFs that indirectly refer 
+        //  to DEFs in humanoid ROUTEs
+        boolean foundRoute = true;
+        while ( foundRoute ) {
+            foundRoute = false;
+            // search all ROUTEs for one which hasn't been marked, yet
+            // refers to a marked ROUTE DEF.
+            for ( int i = 0; i < numberRoutes; i++ ) {
+                if ( !humanoidRoutes.get( i )) {
+//                    System.out.println( "ROUTE " + i + " currenlty not associated with Humanoid" );
+                    ROUTE test = (ROUTE)routes.elementAt( i );
+                    String routeSourceDEF = test.getSourceDEFname();
+                    String routeDestDEF = test.getDestDEFname();
+                    
+                    // don't go above time sensor
+                    if ( isTimeSensor( routeDestDEF )) {
+                        continue;
+                    }
+                    if (( routeSourceDEF != null ) && ( routeDestDEF != null )) {
+//                        System.out.println( "route is from " + routeSourceDEF + " to " + routeDestDEF );
+                        if (( humanoidRouteDEFs.get( routeSourceDEF ) != null ) || ( humanoidRouteDEFs.get( routeDestDEF ) != null )) {
+                            String hsrc = (String)humanoidRouteDEFs.get( routeSourceDEF );
+                            String hdest = (String)humanoidRouteDEFs.get( routeDestDEF );
+//                            System.out.println( "set Indirect ref for ROUTE, hsrc " + hsrc + ", hdest " + hdest );
+                            humanoidRouteDEFs.put( routeDestDEF, routeDestDEF );
+                            humanoidRouteDEFs.put( routeSourceDEF, routeSourceDEF );
+                            foundRoute = true;
+                            humanoidRoutes.set( i );
+                        }
+                    }
+                }
+            }
+        }
+        // At this point Phase 1 & 2 are complete.  The variable 
+        // "humanoidRouteDEFs" contains all the DEFs needed for the
+        // behaviors.  The variable "humanoidRoutes" contains all the
+        // ROUTEs needed for the behaviors.
+
+        // track the routes that need to be associated with behaviors
+        BitSet routesAssignedBehaviors = new BitSet( numberRoutes );
+
+        // initially ROUTEs that have no behavior are treated as if they
+        // have a behavior assigned, so we will never look at them again.
+        for ( int i = 0; i < numberRoutes; i++ ) {
+            if ( !humanoidRoutes.get( i )) {
+                routesAssignedBehaviors.set( i );
+//                System.out.println( "ROUTE " + i + " is not associated with any behavior" );
+            }
+        }
+
+        // for each route not assigned a behavior, find an ultimate source
+        boolean foundBehavior = true;
+        while ( foundBehavior ) {
+            // temp is used to prevent cycles in ROUTEs causing infinite loop
+            BitSet temp = new BitSet( numberRoutes );
+            foundBehavior = false;
+            for ( int i = 0; i < numberRoutes; i++ ) {
+                if ( !routesAssignedBehaviors.get( i )) {
+                    ROUTE ultimate = (ROUTE)routes.elementAt( i );
+                    temp.set( i );
+                    while ( true ) {
+                        ROUTE testUltimate = getROUTEtoSource( ultimate.getSourceDEFname(), routesAssignedBehaviors );
+                        if ( testUltimate == null ) {
+                            break;
+                        } else {
+                            int testIdx = routes.indexOf( testUltimate );
+                            if ( temp.get( testIdx )) {
+                                break;
+                            } else {
+                                temp.set( testIdx );
+                            }
+                            ultimate = testUltimate;
+                        }
+                    }
+                    if ( ultimate != null ) {
+                        createBehavior( ultimate, routesAssignedBehaviors );
+                        foundBehavior = true;
+                    }
+                }
+            }
+        }
+    }
+
+    /** Is a DEF a TimeSensor
+     */
+    boolean isTimeSensor( String defName ) {
+        DEFUSENode dun = scene.getDEF( defName );
+        if ( dun != null ) {
+            com.trapezium.vrml.node.Node n = dun.getNode();
+            if ( n instanceof PROTOInstance ) {
+                PROTOInstance pi = (PROTOInstance)n;
+                PROTObase pb = pi.getPROTObase();
+                if ( pb != null ) {
+                    n = pb.getPROTONodeType();
+                }
+            }
+            if ( n != null ) {
+                return( n.isSensor() );
+            }
+        }
+        return( false );
+    }
+        
+    /** Get a ROUTE that sends to the source DEF parameter.
+     *
+     *  @param sourceDEF the name of the DEF
+     *
+     *  @return a ROUTE that has the sourceDEF as the destination object, and that
+     *     is not already assigned to a behavior.  Returns null if no such ROUTE
+     *     found.
+     */
+    ROUTE getROUTEtoSource( String sourceDEF, BitSet routesAssignedBehaviors ) {
+        int numberRoutes = routes.size();
+        for ( int i = 0; i < numberRoutes; i++ ) {
+            if ( !routesAssignedBehaviors.get( i )) {
+                ROUTE testRoute = (ROUTE)routes.elementAt( i );
+                String routeDest = testRoute.getDestDEFname();
+                if ( sourceDEF.compareTo( routeDest ) == 0 ) {
+                    return( testRoute );
+                }
+            }
+        }
+        return( null );
+    }
+    
+    /** Activate a specific behavior, add it if it isn't there to activate.
+     *  VRML text is only generated for activated behaviors.
+     *
+     *  @param bb the BehaviorBean to activate, and possibly add 
+     */
+    public void activateBehavior( BehaviorBean bb ) {
+        int numberBehaviors = behaviors.size();
+        for ( int i = 0; i < numberBehaviors; i++ ) {
+            HumanBeanBehavior hbb = (HumanBeanBehavior)behaviors.elementAt( i );
+            BehaviorBean test = hbb.getBehaviorBean();
+            if ( test == bb ) {
+                hbb.activate();
+                return;
+            }
+        }
+        behaviors.addElement( new HumanBeanBehavior( bb ));
+    }
+    
+    /** Deactivate a specific behavior.  VRML text is not generated for
+     *  deactivated behaviors.
+     *
+     *  @param bb the BehaviorBean to deactivate
+     */
+    public void deactivateBehavior( BehaviorBean bb ) {
+        int numberBehaviors = behaviors.size();
+        for ( int i = 0; i < numberBehaviors; i++ ) {
+            HumanBeanBehavior hbb = (HumanBeanBehavior)behaviors.elementAt( i );
+            BehaviorBean test = hbb.getBehaviorBean();
+            if ( test == bb ) {
+                hbb.deactivate();
+                return;
+            }
+        }
+    }
+    
+    /** Create a behavior from a single ROUTE down through all the ROUTEs 
+     *  and DEFs it includes. 
+     */
+    void createBehavior( ROUTE ultimate, BitSet routesAssignedBehaviors ) {
+        if ( behaviors == null ) {
+            behaviors = new Vector();
+        }
+        System.out.println( "Behavior " + (behaviors.size() + 1 ) + " root: " + ultimate.getSourceDEFname() + " to " + ultimate.getDestDEFname() );
+        BehaviorBean bb = new BehaviorBean( ultimate, defToJoint, jointToDef );
+        behaviors.addElement( new HumanBeanBehavior( bb ));
+        int rootIdx = routes.indexOf( ultimate );
+        routesAssignedBehaviors.set( rootIdx );
+        boolean foundRoute = true;
+        int numberRoutes = getNumberRoutes();
+        Vector workList = new Vector();
+        workList.addElement( ultimate.getSourceDEFname() );
+        Vector doneList = new Vector();
+        while ( workList.size() > 0 ) {
+            String source = (String)workList.elementAt( 0 );
+            workList.removeElementAt( 0 );
+            if ( doneList.indexOf( source ) >= 0 ) {
+                continue;
+            }
+            for ( int i = 0; i < numberRoutes; i++ ) {
+                ROUTE test = (ROUTE)routes.elementAt( i );
+                String testSource = test.getSourceDEFname();
+                if ( testSource.compareTo( source ) == 0 ) {
+                    bb.saveDEF( source );
+                    saveSensorParent( bb, source );
+                    String dest = test.getDestDEFname();
+                    bb.saveDEF( dest );
+                    saveSensorParent( bb, dest );
+                    bb.saveROUTE( test );
+                    workList.addElement( dest );
+                    routesAssignedBehaviors.set( i );
+                }
+            }
+            doneList.addElement( source );
+        }
+    }
+    
+    void saveSensorParent( BehaviorBean bb, String defName ) {
+        if ( isTimeSensor( defName )) {
+            DEFUSENode dun = scene.getDEF( defName );
+            if ( dun != null ) {
+                com.trapezium.vrml.node.Node n = dun.getNode();
+                if ( n.isSensor() ) {
+                    if ( n.getNodeName().compareTo( "TimeSensor" ) != 0 ) {
+                        n = dun.getNodeParent();
+                        if ( n != null ) {
+                            bb.addSensorContainingNode( n );
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

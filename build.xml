@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Author: Michael Louka
+Created: 8 December 2005
+$Revision: 1.9 $ ($Date: 2012/02/29 11:52:09 $)
+-->
+<project basedir="src" default="build" name="chisel">
+
+    <target name="init">
+        <!-- Compiler debug flag -->
+        <property name="use-debug" value="true"/>
+    </target>
+
+    <target depends="init" name="compile">
+         <echo message="Compiling with debug=${use-debug}"/>
+         <javac debug="${use-debug}" deprecation="false" destdir="." srcdir="."  source="1.8" target="1.8"
+                includeantruntime="false"> <!-- https://stackoverflow.com/questions/5103384/ant-warning-includeantruntime-was-not-set -->
+            <classpath>
+            </classpath>
+        </javac>
+        <echo message="Source compiled."/>
+    </target>
+
+    <target depends="init,compile" name="jar">
+        <jar basedir="." compress="true" jarfile="../build/chisel.jar">
+            <exclude name="**/*.java"/>
+            <exclude name="**/*.form"/>
+            <exclude name="**/*.*~"/>
+        </jar>
+    </target>
+
+    <target depends="init,compile, jar" name="build">
+        <echo message="Chisel built."/>
+    </target>
+    
+   <target depends="build" description="Build all" name="all">
+        <echo message="Chisel build completed."/>
+    </target>
+    
+    <target depends="build" description="Create release installers." name="release">
+        <echo message="Creating installers..."/>
+        <!--<exec executable="/Applications/Macrovision/InstallAnywhere 8.0 Standard/build.command" dir="../release">
+          <arg line="${basedir}/../release/chisel.iap_xml"/>
+        </exec>-->
+    <echo message="... DISABLED"/>
+    <echo message="Chisel release completed."/>
+    </target>
+
+    <target depends="jar" description="Run Chisel." name="run">
+       <java classname="com.trapezium.chisel.Chisel"  failonerror="true" fork="true" dir="../">
+            <jvmarg value="-Xms64m"/>
+            <jvmarg value="-Xmx512m"/>   
+            <classpath>
+                <pathelement location="../build/chisel.jar"/>
+            </classpath>
+        </java>
+    </target>
+        
+    <target depends="init" description="JavaDoc for Chisel." name="javadoc">
+        <mkdir dir="../apidoc"/>
+        <javadoc destdir="../apidoc" packagenames="*">
+            <sourcepath>
+                <pathelement location="."/>
+            </sourcepath>
+            <classpath>
+                <pathelement location="../build/chisel.jar"/>
+            </classpath>
+        </javadoc>
+    </target>
+
+    <target depends="init" description="Clean all build products." name="clean">
+        <delete>
+            <fileset dir=".">
+                <include name="**/*.class"/>
+                <include name="**/*.*~"/>
+            </fileset>
+        </delete>
+        <delete file="../build/chisel.jar"/>
+        <delete dir="../apidoc"/>
+    </target>
+
+</project>

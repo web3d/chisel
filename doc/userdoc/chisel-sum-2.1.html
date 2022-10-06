@@ -1,0 +1,839 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+
+
+<meta http-equiv="Content-Type" content="text/html;CHARSET=iso-8859-1"><title>Chisel Users Guide</title>
+
+<style>
+	body.doc { padding-left:50px; padding-right:20px; background-repeat : repeat-y;
+	font-size : 12px;
+	color : #000000;
+	font-family : Tahoma, Geneva, Arial, Helvetica, sans-serif;
+	line-height : 18px;
+	background-color : #ffffff;
+	}
+	A, A:LINK, A:VISITED, A:ACTIVE {
+	font-family: Tahoma, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color : #CC0033;
+	font-weight : bold;
+	text-decoration : none;
+	line-height : 18px;
+	}
+	A:HOVER, A:FOCUS {
+	font-family: Tahoma, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color : #CC0033;
+	font-weight : bold;
+	text-decoration : underline;
+	line-height : 18px;
+	}
+	h1 {
+	font-family: Tahoma, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 24px;
+	font-weight : bold;
+	color : #9999A0;
+	text-decoration : none;
+	}
+	h2 {
+	font-family: Tahoma, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	font-weight : bold;
+	color : #000000;
+	text-decoration : none;
+	}
+</style></head><body class="doc" alink="#cc0033" background="doc-files/hg_forum.gif" bgcolor="#ffffff" link="#cc0033" text="#000000" vlink="#cc0033">
+		<h1 align="center">Chisel VRML Optimizer</h1>
+		<h2>Chisel 2.1 Users Manual</h2>
+		<p><i>Chisel used to be a commercial tool available from Trapezium Development LLC. It is no longer developed be Trapezium and its creators, Michael St. Hippolyte and Joh Johannsen staff of Trapezium, generously placed the code and software in the public domain. Michael Louka fixed some bugs and added a new &quot;Simplify DEF names&quot; chisel, and released this updated version as Chisel 2.1 (HVRC Edition) via the Halden VR Centre web site in 2005. D. G. van der Laan has contributed support for preserving texCoord and texCoordIndex fields when joining shapes by color. This is unsupported freeware.</i></p>
+                </i></p>
+		<h3>Important</h3>
+		<p><i><b>Always run Chisel on a copy of your model, in case it fails and creates an unreadable VRML file.<br>
+		This is particularly important when using the Reduction tasks.</b></i></p>
+		<h3>No Warranty</h3>
+		<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+		<hr>
+		<p><b>Copyright 1998-2000, Trapezium Development, LLC<br>
+			Portions copyright 2005-2010, Michael Louka.<br>
+			Portions copyright 2008, D.G. van der Laan.</b></p>
+			<p><i>This application uses HTML parsing technology from Arthur Do Consulting.</i></p>
+		<ul>
+			<li><a href="#Overview">Overview</a></li>
+			<li><a href="#Tutorial">Step-by-step Example</a></li>
+			<li><a href="#Menu">Menu</a></li>
+
+<li><a href="#Toolbar">Toolbar</a></li>
+
+<li><a href="#Chisels">Chisels</a> 
+
+<ul>
+<li><a href="#Validate">Validate</a></li>
+
+<li><a href="#Format">Format</a></li>
+
+<li><a href="#clean">Clean</a></li>
+
+<li><a href="#condense">Condense</a></li>
+
+<li><a href="#reduce">Reduce</a></li>
+
+<li><a href="#Reorg">Reorganize</a></li>
+
+<li><a href="#Mutate">Mutate</a></li>
+
+</ul>
+			<li><a href="#CLChisel">Command Line Chisel</a></li>
+		</ul>
+		<h2><a name="Overview"></a>Overview</h2>
+
+<p>Chisel is a program for improving the quality, performance and reliability of VRML worlds. Chisel offers authors a wide range of tools for working with VRML&nbsp;files:&nbsp;diagnostic tools for locating errors, cleaners for converting dangerous and cluttered code to safe and clean code, lossy and non lossy data reducers, file reorganizers, special effects and compression. Chisel combines the technology found in Trapezium's Vorlon, the freeware VRML 97 syntax checker in wide use by VRML authors around the world, with advanced 3D information processing techniques with a straightforward user interface.</p>
+
+<p>Reducing file size and improving reliability and performance
+go hand in hand. Probably the most valuable tools provided by
+Chisel are the Cleaners, because they make files both smaller and
+better. The cleaners remove code that is unnecessary, redundant,
+unusable etc. The size reduction is often dramatic, and the
+resulting file is more likely to run consistently across
+browsers.</p>
+		<p>Other tool sets provided by Chisel include Condensers, which
+provide non-lossy or insignificantly-lossy reduction by changing
+the representation or precision of the data; Reducers, which
+perform polygon reduction; Mutators, which transform models in
+various ways; and Reorganizers, which change the way a world is
+divided into parts.</p>
+		<h2><a name="Tutorial"></a>Step-by-step Example</h2>
+		<h3>Example #1: cleaning a file</h3>
+
+<p>This example is a very simple example of a file which is
+described in a less than optimal way. The list of coordinates has
+two unused coordinates, and the 8 vertices of the cube are
+repeated in coordinates 0-7 and coordinates 10-17. The file is
+called <b>bigcube.wrl</b>.</p>
+
+<ol>
+<li>Open the file, by clicking on the <img src="doc-files/open.gif" alt="open icon" align="bottom" border="0" height="16" width="16">
+icon, or select "File" then "Open" from the menu.</li>
+
+<li>Note that after the file is loaded, the VALIDATE line appears
+as follows:<br>
+<img src="doc-files/validate1.gif" alt="validate gif" align="bottom" border="0" height="26" width="486"></li>
+
+<li>Note that the CLEAN section appears as follows:<br>
+<img src="doc-files/clean_main.gif" alt="main gif" align="bottom" border="0" height="249" width="491"></li>
+
+<li>The CLEAN button turns green and selections are automatically
+made if there is unnecessary text in the file. To remove the
+text, click on the <img src="doc-files/clean2.gif" alt="clean gif" align="bottom" border="0" height="27" width="93"> button.</li>
+
+<li>Note the data reduction estimate before clicking the CLEAN
+button:<br>
+<img src="doc-files/polycount1.gif" alt="polygon count gif" align="bottom" border="0" height="21" width="496"> 
+
+<p>After clicking the CLEAN button, this may be different.</p>
+
+<p><img src="doc-files/polycount2.gif" alt="polygon count gif 2" align="bottom" border="0" height="22" width="499"></p>
+
+<p>This means that the size of the file has been reduced by about
+20% due to the removal of the unnecessary text.</p>
+</li>
+
+<li>Save the file by clicking on the <img src="doc-files/save.gif" alt="save gif" align="bottom" border="0" height="16" width="16">
+icon, or select "File", then "Save" from the menu.</li>
+</ol>
+
+<h3>Example #1 (continued): reformatting</h3>
+
+<ol>
+<li>The display window shows the new file, but the format is not
+all that nice. This is because part of the file was changed as
+unnecessary coordinates were removed and coordIndex values
+adjusted. To reformat, click on the <img src="doc-files/format1.gif" alt="format gif" align="bottom" border="0" height="26" width="95"> button.</li>
+</ol>
+
+<h2><a name="Menu"></a>The Menu</h2>
+
+<h2><img src="doc-files/menu.gif" alt="menu gif" align="bottom" border="0" height="21" width="245"></h2>
+
+<p>The menu options duplicate the toolbar, with the following
+exceptions:</p>
+
+<ol>
+			<li><b>Generate HTML report</b> under the <b>File</b> menu
+generates a report of the details of the savings for each
+chisel.</li>
+			<li><b>Options</b> under the <b>View</b> menu gives control over
+the following options: 
+
+<ul>
+<li><b>Save in Unix format</b> - By default, Java uses a system dependent line terminating character. This is 0xd 0xa on Windows systems, 0xa on Unix systems. Checking this option overrides the Windows default, and saves files using the 0xa line terminator. This option will have no effect when used on Unix systems.</li>
+					<li><b>Additional options</b> - Select those that you wish to apply when you access the options dialog.
+				</ul>
+</li>
+		</ol>
+
+<h2><a name="Toolbar"></a>The Toolbar</h2>
+
+<h2><img src="doc-files/toolbar.gif" alt="toolbar" align="bottom" border="0" height="33" width="438"></h2>
+
+<p><b><i>Hint:</i></b> Chisel includes toolbar tips, so if you
+aren't sure what a particular button does, just hold the mouse
+over the button and a tip will appear.</p>
+
+<blockquote>
+<h4><img src="doc-files/open.gif" alt="open icon" align="bottom" border="0" height="16" width="16"> Open a file</h4>
+
+<p>Brings up the standard file selection dialog window. Once a
+file is opened, it is syntax checked.</p>
+
+<h4><img src="doc-files/fetch.gif" alt="fetch icon" align="bottom" border="0" height="16" width="16"> Fetch a file</h4>
+
+<p>Creates a local copy of a remote file specified by a url. The
+local copy is then opened and syntax checked. Optionally creates
+local copies of all files referenced by the url. Referenced files
+copied can be limited to either subdirectories of the original
+url, or any directory on the same site as the original url.</p>
+
+<p>File references can be extracted from HTML as well as VRML
+files, and are also extracted from Javascript code in the HTML.
+For example, to download all the ".wrl" files from a site, just
+enter the url for the site.</p>
+
+<p>A log of all fetched files is kepted in the directory where
+chisel was started, under the name <b>fetch.log</b>. This log
+file is overwritten each time another fetch is performed.</p>
+
+<p>Fetch options allow control over what gets fetched. In
+general, fetches can be limited by site, directory, and file
+extension category:</p>
+
+<ul>
+<li><b>Retrieve referenced files</b> - when checked, this option
+gets all files referenced from an HTML or WRL file, and depending
+on the file extension (see the additional Fetch options below),
+fetches those files. Each HTML or WRL file retrieved is checked
+for file references, and those referenced files are also
+retrieved.</li>
+
+<li><b>Limit retrieval to original directory and
+subdirectories</b> - when set, only files from the original url
+directory or its subdirectories. All other file references are
+ignored.</li>
+
+<li><b>Limit retrieval to site</b> - when set, only files from
+the same site as the original url are retrieved.</li>
+
+<li><b>Fetch GIF,JPG,PNG</b> - when set, files with the extension
+".gif", ".jpg" and ".png" are fetched. Otherwise, these files are
+not fetched.</li>
+
+<li><b>Fetch sound WAV,MID</b> - when set, files with the
+extension ".wav" and ".mid" are fetched. Otherwise, these files
+are not fetched.</li>
+
+<li><b>Fetch HTML</b> - when set, files with the extension ".htm"
+and ".html" are fetched. Otherwise, these files are not
+fetched.</li>
+
+<li><b>Fetch MPEG,MOV,AVI</b> - when set, files with the
+extension ".mpeg", ".mov" and ".avi" are fetched. Otherwise,
+these files are not fetched.</li>
+</ul>
+
+<h4><img src="doc-files/save.gif" alt="save icon" align="bottom" border="0" height="16" width="16"> Save</h4>
+
+<p>Saves a file using the same name used when it was loaded. The
+file is saved as ascii text.</p>
+
+<h4><img src="doc-files/saveas.gif" alt="saveas icon" align="bottom" border="0" height="16" width="16"> Save As</h4>
+
+<p>Brings up a standard file selection dialog window. The file is
+saved under the name specified. The file is saved as ascii
+text.</p>
+
+<h4><img src="doc-files/gzipsave.gif" alt="gzip save icon" align="bottom" border="0" height="16" width="16"> Save Gzipped</h4>
+
+<p>Saves a file using the same name used when it was loaded.
+Leading spaces are removed from the beginning of each line in the
+file, and the file is saved in compressed form using gzip
+encoding.</p>
+
+<h4><img src="doc-files/gzipsaveas.gif" alt="gzip saveas icon" align="bottom" border="0" height="16" width="16"> Save Gzipped
+As</h4>
+
+<p>Brings up a standard file selection dialog window. Leading
+spaces are removed from the beginning of each line in the file,
+and the file is saved in compressed form using gzip encoding
+under the name specified..</p>
+
+<h4><img src="doc-files/copy.gif" alt="copy icon" align="bottom" border="0" height="16" width="15"> Copy selected text to
+clipboard</h4>
+
+<p>NOTE: Chisel does not have built in text editting. However,
+with chisel, double clicking within a node selects the entire
+node. This command allows the selected node to be copied to the
+clipboard, so that it is available for pasting in any editor.</p>
+
+<h4><img src="doc-files/redo.gif" alt="redo icon" align="bottom" border="0" height="16" width="16"> Redo</h4>
+
+<p>Redo an Undo.</p>
+
+<h4><img src="doc-files/undo.gif" alt="undo icon" align="bottom" border="0" height="16" width="16"> <a name="undo"></a>Undo</h4>
+
+<p>Undoes the effect of the most recent set of chisels.</p>
+
+<h4><img src="doc-files/stop.gif" alt="stop icon" align="bottom" border="0" height="16" width="16"> Stop</h4>
+
+<p>Stops the current set of chisels from running. NOTE:
+serializing cannot be stopped, and some cases stopping is not
+immediate.</p>
+
+<h4><img src="doc-files/preverror.gif" alt="prev error icon" align="bottom" border="0" height="16" width="16"> Jump to previous
+error</h4>
+
+<p>Searches backward in the file for an error, warning, or
+nonconformance line. If found, the view window is scrolled to
+that point, and the line is displayed in red. The status bar
+indicates the line number and error number. The search begins
+from the current error if visible, otherwise from the last line
+in the viewer window.</p>
+
+<h4><img src="doc-files/nexterror.gif" alt="next error icon" align="bottom" border="0" height="16" width="16"> Jump to next
+error</h4>
+
+<p>Searches forward in the file for an error, warning, or
+nonconformance line. If found, the view window is scrolled to
+that point, and the line is displayed in red. The status bar
+indicates the line number and error number. The search begins
+from the current error if visible, otherwise from the first line
+in the viewer window.</p>
+</blockquote>
+
+<h2><a name="Chisels"></a>The Chisels</h2>
+
+<h2><img src="doc-files/chisels.gif" alt="chisels" align="bottom" border="0" height="202" width="235"></h2>
+
+<p>The "+" character to the left of each chisel brings up the
+list of chisels for each category. Clicking the checkbox to the
+left of a chisel enables it. To run the enabled chisels in a
+particular category, just click on one of the buttons above, or
+select a category to run from the <a href="#process">process</a>
+menu.</p>
+
+<p>A chisel category button is green when any of its chisels are
+enabled.</p>
+
+<h3><a name="Validate"></a>VALIDATE</h3>
+
+<p>Chisel incorporates the Vorlon version 1.51 VRML 97 syntax checker.</p>
+
+<p>Clicking on the <img src="doc-files/validate2.gif" alt="validate" align="bottom" border="0" height="26" width="94"> button runs the
+Vorlon syntax check. In most cases, this is not necessary, since
+it runs automatically when a file is loaded. The syntax check
+also runs automatically after any file is altered by any of the
+chisels.</p>
+
+<p>However, in some cases, users may with to activate or disable
+some of the options described below during the syntax checking
+phase.</p>
+
+<blockquote>
+<h4>Humanoid Animation 1.1</h4>
+
+<p>Checking this option enables some additional checks for conformance with the Humanoid Animation 1.1 specification.</p>
+
+<h4>Disable nonconformance checks</h4>
+
+<p>Conformance checks are related to Table 7-1 of the VRML 97
+specification, and describe some limits which a VRML 97 compliant
+browser must implement. A user may wish to disable these checks
+if the file in question is known to display correctly on the
+target browsers.</p>
+
+<h4>Disable warnings</h4>
+
+<p>NOTE: disabling warnings will make some of the hints
+associated with chisels also disappear. Some of these hints are
+based on warnings found in the file.</p>
+
+<p>Warnings indicate unnecessary text or questionable VRML
+constructs. In many cases, there may be so many such warnings
+that the user wishes to disable them altogether.</p>
+
+<h4>Disable unused DEF warnings</h4>
+
+<p>In many cases, authors may with to preserve DEF names, and do
+not wish to see "unused DEF" warnings. Checking this option
+disables all "unused DEF" warnings.</p>
+</blockquote>
+
+<h3><a name="Format"></a>FORMAT</h3>
+
+<p>Chisel rewrites portions of a file in an unformatted manner.
+To create a consistent format for the entire file, click on the
+<img src="doc-files/format1.gif" alt="format" align="bottom" border="0" height="26" width="95"> button.</p>
+
+<blockquote>
+<h4>Remove Comments</h4>
+
+<h4><img src="doc-files/format4.gif" alt="format" align="bottom" border="0" height="21" width="149"></h4>
+
+<p>Selecting this option removes all comments from a file during
+the reformat.</p>
+
+<h4>Wrap lines</h4>
+
+<h4><img src="doc-files/format2.gif" alt="format" align="bottom" border="0" height="47" width="340"></h4>
+
+<p>Selecting this option (default on) enables line wrap for long
+sequences of characters. New lines automatically occur when
+bracket and brace characters are encountered, so this option
+mainly applies to long sequences of numbers.</p>
+
+<p>The <b>maximum line length</b> control gives the maximum
+number of characters for a reformatted line.</p>
+
+<h4>Indent</h4>
+
+<h4><img src="doc-files/format3.gif" alt="format" align="bottom" border="0" height="41" width="340"></h4>
+			<p>The Indent option combined with <b>indentation spaces</b>
+defines how far each line is indented. When the indent option is
+off, the result is that no lines are indented (i.e. functionally
+the same as <b>indentation spaces</b> set to <b>0</b>).</p>
+			<h4>Tab every N spaces</h4>
+			<p>Converts n spaces (default 3) into a single tab character.</p>
+		</blockquote>
+
+<h3><a name="clean"></a>CLEAN</h3>
+
+<p>This section contains the chisels which eliminate the text
+producing warnings during the syntax check. When a file is first
+loaded, it is validated. If any unnecessary text is found, this
+button turns green: <img src="doc-files/clean2.gif" alt="clean icon" align="bottom" border="0" height="27" width="93"> and the chisels
+required to remove that text are automatically enabled, which is
+indicated by the check mark box.</p>
+
+<p>The <a href="#condense">CONDENSE</a> category is similar,
+except its categories are not automatically selected, because in
+some cases some of the text that appears unnecessary is actually
+required by an external EAI application.</p>
+
+<blockquote>
+<h4>Remove default fields</h4>
+
+<h4><img src="doc-files/clean_2.gif" alt="clean icon" align="bottom" border="0" height="22" width="209"></h4>
+
+<p>Selecting this option removings field values which are
+explicitly declared with a value identical to the default field
+value.</p>
+
+<h4>Remove repeated value refs</h4>
+
+<h4><img src="doc-files/clean_3.gif" alt="clean icon" align="bottom" border="0" height="21" width="211"></h4>
+
+<p>Repeated value references are one of the most complex types of
+unnecessary information. The VRML 97 specification repeatedly
+uses a technique where a set of values is referenced by an
+optional set of "index" values. This chisel removes repeated
+values by adjusting the corresponding "index" values.</p>
+
+<p>NOTE: using this chisel may create unused values. This is why
+the <b>Remove unused values</b> box is automatically selected
+whenever this box is selected.</p>
+
+<p>NOTE: this chisel does not create "index" values. See <a href="#createIndexFields">Create index fields</a> in the <a href="#condense">CONDENSE</a> section for how to automatically create
+index values.</p>
+
+<h4>Remove unused values</h4>
+
+<h4><img src="doc-files/clean_4.gif" alt="clean icon" align="bottom" border="0" height="21" width="211"></h4>
+
+<p>Unused values are values which are not referenced by an
+"index" value. This could be any of the following:</p>
+
+<ul>
+<li>Coordinate node values in an IndexedFaceSet/IndexedLineSet
+not referenced by the coordIndex field</li>
+
+<li>TextureCoordinate node values in an IndexedFaceSet not
+referenced by a texCoordIndex field</li>
+
+<li>Normal node values in an IndexedFaceSet not referenced by a
+normalIndex field</li>
+
+<li>Color node values in an IndexedFaceSet/IndexeLineSet not
+referenced by a colorIndex field</li>
+</ul>
+
+<h4>Remove repeated index values</h4>
+
+<h4><img src="doc-files/clean_5.gif" alt="clean icon" align="bottom" border="0" height="21" width="209"></h4>
+
+<p>This refers to index fields where the same index value is
+repeated. For example, a coordIndex in an IndexedFaceSet may
+define a face with the coordinates: 0 1 2 2 2 3 -1. This chisel
+would replace the "2 2 2" sequence with the single digit "2".</p>
+
+<p>NOTE: This is one of those chisels that may appear a bit
+unusual, but it is something that does occasionally occur with
+several exporters. In addition, some of the polygon reduction
+tools rely on this chisel to clean up IndexedFaceSets after
+coordinates are merged.</p>
+
+<h4>Remove repeated fields</h4>
+
+<h4><img src="doc-files/clean_6.gif" alt="clean icon" align="bottom" border="0" height="21" width="212"></h4>
+
+<p>When the same field is defined more than once, this chisel
+removes the second declaration of the field.</p>
+
+<h4>Remove bad faces</h4>
+
+<h4><img src="doc-files/clean_8.gif" alt="clean icon" align="bottom" border="0" height="22" width="214"></h4>
+
+<p>This chisel removes faces consisting of 1 or 2 edges.</p>
+
+<h4>Remove useless interpolators</h4>
+
+<h4><img src="doc-files/clean_8a.gif" alt="clean icon" align="bottom" border="0" height="22" width="199"></h4>
+
+<p>This chisel removes any interpolator with 0 or 1 key.</p>
+
+<h4>Move ROUTEs to end of file</h4>
+
+<h4><img src="doc-files/clean_10.gif" alt="clean icon" align="bottom" border="0" height="21" width="221"></h4>
+
+<p>NOTE: this chisel should not be used if ROUTEs are contained
+within PROTOs. Its intended use is described below.</p>
+
+<p>This chisel handles a special case of an exported bug in some
+versions of the 3DSMax VRML 97 exporter. In some cases this
+exported places ROUTEs illegally in the <b>children</b> field of
+a node. This chisel moves those ROUTEs to the end of the
+file.</p>
+
+<h4><a name="removeUnnecessaryInterpolator"></a>Remove
+unnecessary interpolator values</h4>
+
+<h4><img src="doc-files/clean_11.gif" alt="clean icon" align="bottom" border="0" height="22" width="260"></h4>
+
+<p>When key or keyValue entries are repeated more than twice, the
+middle entries of the repeated sequence are unusable. In the case
+of keys, these middle values cannot be accessed. In the case of
+key values, these middle values provide redundant information.
+This chisel removes these middle entries in repeated sequences.
+It also handles the case of NormalInterpolator and
+CoordinateInterpolator, where the number of keyValue entries per
+key may vary.</p>
+			<p>NOTE: Repeating key entries twice is necessary only when
+discontinuous motion is required. If key entries are repeated,
+and continous motion is desired, this information can be removed
+using the <a href="#singleInterpolatorKey">Single value
+interpolator keys</a> chisel.</p>
+			<h4>Generate diffuseColor field for IFS</h4>
+			<p><img src="doc-files/exp1.gif" alt="" width="231" height="22" border="0"></p>
+			<p>Generates a diffuseColor field for each indexed face set.</p>
+		</blockquote>
+
+<h3><a name="condense"></a>CONDENSE</h3>
+
+<p>The condense category of chisels is similar to clean in that it removes unnecessary text, but in some cases such removal is lossy, and in other cases there may be external code, such as an EAI application, relying on the text. Chisels in this category should be considered carefully before use. It is highly recommended that you save the condensed file under a new name in case you need to revert to the original.</p>
+
+<blockquote>
+<h4>Adjust numeric resolution</h4>
+
+<h4><img src="doc-files/condense_1.gif" alt="condense section" align="bottom" border="0" height="106" width="349"></h4>
+
+<p>This chisel adjusts numeric resolution of Coordinate, Color,
+TextureCoordinate, and Normal nodes. In many cases, exporters
+output these numbers with a much greater resolution than
+necessary.</p>
+
+<h4>Adjust interpolator resolution</h4>
+
+<h4><img src="doc-files/condense_2.gif" alt="condense section" align="bottom" border="0" height="274" width="358"></h4>
+
+<p>This chisel adjusts the numeric resolution of all the
+interpolators. The sub-options allow resolution to be indicated
+by type of interpolator.</p>
+
+<h4>Create DEF/USE</h4>
+
+<h4><img src="doc-files/condense_3.gif" alt="condense section" align="bottom" border="0" height="20" width="211"></h4>
+
+<p>This chisel goes through the entire file, looking for
+duplicated node definitions. When a duplicated node is found, the
+first instance is DEFfed, and the subsequent instances are
+USEd.</p>
+
+<h4>Create PROTOs for interpolators</h4>
+
+<h4><img src="doc-files/condense_3a.gif" alt="condense section" align="bottom" border="0" height="22" width="209"></h4>
+
+<p>Animation sometimes creates many interpolators with the same
+keys. This chisel creates a PROTO with a default key and
+substitutes instances of that PROTO for any interpolator.</p>
+
+<h4><a name="createIndexFields"></a>Create index fields</h4>
+
+<h4><img src="doc-files/condense_4.gif" alt="condense section" align="bottom" border="0" height="22" width="195"></h4>
+
+<p>The VRML 97 specification often makes use of a technique where
+a list of values is referenced by an optional list of index
+values. When the index is absent, the list of values may contain
+many repeated values. For example, when assigning colors to faces
+in an IndexedFaceSet, the Color node will have one color entry
+per face. If there are many faces, but only a few colors, colors
+will be repeated many times.</p>
+
+<p>This chisel creates the index field for a value list if the
+value list is large (&gt;100 values) and contains many (&gt;20)
+repeated values.</p>
+
+<h4>Remove empty IndexedFaceSets</h4>
+
+<h4><img src="doc-files/clean_9.gif" alt="clean section" align="bottom" border="0" height="21" width="211"></h4>
+
+<p>This chisel removes IndexedFaceSets that have no faces. Note
+that empty IndexedFaceSets can be created by the chisels which
+remove duplicate values and repeated indexes.</p>
+
+<h4>Remove normals</h4>
+
+<h4><img src="doc-files/condense_5.gif" alt="condense section" align="bottom" border="0" height="21" width="194"></h4>
+
+<p>Many exporters generate normals for models. However, if these
+normals are eliminated, the browser will calculate the normals.
+This is a trade off between file size, and start-up performance.
+In files we have tested with, in all cases the time-to-display is
+faster when the normals are removed.</p>
+
+<h4>Remove unused DEFs</h4>
+
+<h4><img src="doc-files/clean_1.gif" alt="clean section" align="bottom" border="0" height="43" width="243"></h4>
+
+<p>Selecting this option removes unused DEFs. The <b>Preserve
+Viewpoint DEFs</b> sub-option is provided because Viewpoint DEFs
+are a special case. It is impossible to determine whether
+Viewpoint DEFs are unused since they can be referenced from
+another file.</p>
+
+<h4>Remove unused PROTO interface fields</h4>
+
+<h4><img src="doc-files/clean_7.gif" alt="clean section" align="bottom" border="0" height="23" width="250"></h4>
+			<p>This chisel removes PROTO interface fields that are not
+referened by <b>IS</b> syntax within the PROTO. The unused field
+is also removed from any PROTO instances declaring that
+field.</p>
+				
+<h4>Shorten DEF names</h4>
+				
+<h4><img src="doc-files/condense_8.gif" alt="clean section" align="bottom" border="0" height="20" width="139"></h4>
+<p>Renames named node instances (DEF) and their usages (USE) using shorter names (AAA, AAB, AAC, etc.).</p>
+				
+<h4>Simplify DEF names</h4>
+					
+<h4><img src="doc-files/condense_9.gif" alt="clean section" align="bottom" border="0" height="19" width="142"></h4>
+<p>Substitutes characters in (DEF) node names that are neither numerals or letters with '_' while maintining uniqueness of names by adding a numeral if the simplified name is already in use. This chisel is useful when a modelling tool exports a VRML file with characters such as &amp; and % in node which are not acceptable if the nodes are to be accessed by name from scripting languages (since while these names are legal VRML node names, they are not legal variable names in languages such as JavaScript, and some VRML viewers do not therefore accept them). <i>This chisel is new in version 2.1.</i></p>
+
+<h4><a name="singleInterpolatorKey"></a>Single value interpolator keys</h4>
+
+<h4><img src="doc-files/condense_6.gif" alt="condense section" align="bottom" border="0" height="22" width="199"></h4>
+
+<p>NOTE: This is related to the <a href="#removeUnnecessaryInterpolator">Remove unnecessary interpolator
+values</a> chisel.</p>
+			<p>This chisel examines all interpolators, and limits key entries
+to unique values. Subsequent repeated key entries, and their
+associated keyValue entries are removed. This chisel should be
+used if the interpolators are being used to describe continuous
+motion. Repeated key entries are only neessary for describing
+discontinuous motion.</p>
+
+				<h4>Remove material node</h4>
+				<h4><img src="doc-files/condense_10.gif" alt="clean section" align="bottom" border="0" height="41" width="256"></h4>
+				<p>Removes material nodes from Appearance nodes. By default, this is only done if textures are available.</p>
+		</blockquote>
+
+<h3><a name="reduce"></a>REDUCE</h3>
+
+<p>This category contains the polygon reduction chisels. The polygon reduction provided is not the best available, but it does work well for many models, and does a reasonably good job of creating lower polygon count models for LODs and reducing models with large numbers of polygons exported from CAD systems. It is highly recommended that you save the reduced file under a new name in case you need to revert to the original.</p>
+
+<blockquote>
+<h4>Coplanar triangle to quad</h4>
+
+<h4><img src="doc-files/reduce_1.gif" alt="reduce section" align="bottom" border="0" height="21" width="200"></h4>
+
+<p>This chisel may or may not be a polygon reduction chisel,
+depending on your point of view. Many exporters create only
+triangulated models. This chisel takes two coplanar triangulated
+faces, and converts them into a quadrilateral. The result is
+fewer polygons from the point of view of faces described in the
+resulting IndexedFaceSet, but from the browser point of view, the
+number of triangles is unchanged.</p>
+
+<p>This chisel is mainly useful for those cases where the
+exporter creates a large number of these coplanar triangulated
+faces. In that case, using this chisel reduces the file size.</p>
+
+<h4>Remove smallest edges</h4>
+
+<h4><img src="doc-files/reduce_2.gif" alt="reduce section" align="bottom" border="0" height="106" width="332"></h4>
+
+<p>An edges is removed by assigning each edge coordinate a new
+value, which is the center of the edge. Only edges that are
+between triangles are candidates for removal. If the triangles
+have been reshaped due to a previous edge removal, the edge is
+not removed. For each edge removed by this algorithm, the
+resulting model has two faces with no area. These invisible faces
+are removed by the <a href="#clean">CLEAN</a> chisels which run
+automatically after this one completes.</p>
+
+<p>This chisel finds the <b>% marked edges to remove</b> in
+IndexedFaceSets with at least <b>min edge count</b> edges and
+attempts to remove those edges. Edge removal starts with the
+candidate set of edges which are ordered by size, the smallest
+edges are removed first. Subsequent edge candidates are only
+removed if they are between two triangles that have not been
+reshaped by previous edge removals.</p>
+
+<p>The <b>preserve color boundaries</b> option limits this
+algorithm to reshaping triangles that are surrounded only by
+triangles of the same color.</p>
+
+<p>The <b>% bounding box increase</b> option handles the case
+where a large model is made up of a number of connected smaller
+models. The algorithm does not reshape triangles that fall into
+the area of overlapping bounding boxes between IndexedFaceSets.
+This option allows that unaffected area to be expanded.</p>
+
+<h4>Remove smallest triangles</h4>
+
+<p><img src="doc-files/reduce_3.gif" alt="reduce secton" align="bottom" border="0" height="84" width="333"></p>
+
+<p>A triangles is removed by taking the three coordinates of a
+triangle, and making each coordinate the coordinate of the center
+of the triangle.</p>
+
+<h4>Merge parallel edges</h4>
+
+<h4><img src="doc-files/reduce_4.gif" alt="reduce section" align="bottom" border="0" height="41" width="332"></h4>
+
+<p>This algorithm takes two edges which are parallel or nearly
+parallel, and converts these to a single edge. The threshold
+boundary can be used to select what is "nearly parallel", smaller
+numbers select more edges.</p>
+</blockquote>
+
+<h3><a name="Reorg"></a>REORGANIZE</h3>
+
+<p>The chisels in this category merge or break up files, IndexedFaceSets, and ElevationGrids. Chisels in this category should be considered carefully before use. It is highly recommended that you save the reorganised file under a new name in case you need to revert to the original.</p>
+		<blockquote>
+<h4>Uninline files</h4>
+
+<h4><img src="doc-files/reorg_1.gif" alt="reorganize section" align="bottom" border="0" height="21" width="183"></h4>
+
+<p>This chisel takes files inlined using the <b>Inline</b> node,
+and merges them into the current file. It handles resolving
+conflicting DEF names, and may rename some DEFs in the merged
+file.</p>
+			<h4>Un-PROTO</h4>
+			<p><img src="doc-files/exp2.gif" alt="" width="205" height="20" border="0"></p>
+			<p>Attempts to remove PROTOtypes, replacing them with equivalent nodes throughout the scene graph. Use with caution.</p>
+			<h4>Turn Shapes into Inlines</h4>
+			<h4><img src="doc-files/reorg_2.gif" alt="reorganize section" align="bottom" border="0" height="22" width="175"></h4>
+
+<p>This chisel turns all Shape nodes into Inline nodes, creating
+the inlined files in the process.</p>
+
+<p>If a single Shape node is selected, only that single Shape
+node is turned into an Inline node.</p>
+			<h4>Join Shapes by color</h4>
+			<p><img src="doc-files/exp3.gif" alt="" width="212" height="22" border="0"></p>
+			<p>Attempts to merge Shapes that are the same colour.</p>
+			<h4>Split IFS by color</h4>
+			<h4><img src="doc-files/reorg_3.gif" alt="reorganize section" align="bottom" border="0" height="21" width="172"></h4>
+
+<p>This chisel breaks a Shape node containing an IndexedFaceSet
+into one Shape node for each color specified in the <b>
+colorIndex</b> field. If the IndexedFaceSet does not have a <b>
+colorIndex</b> field, the field can be created using the <a href="#createIndexFields">Create index fields</a> chisel.</p>
+
+<h4>Split IFS by connectivity</h4>
+
+<h4><img src="doc-files/reorg_4.gif" alt="reorganize section" align="bottom" border="0" height="22" width="168"></h4>
+
+<p>This chisel breaks a Shape node containing an IndexedFaceSet
+into several different Shape nodes. A new Shape node with an
+IndexedFaceSet is created for each connected set of polygons in
+the IndexedFaceSet. If all polygons are connected, the file is
+not changed.</p>
+
+<h4>Split ElevationGrid</h4>
+
+<h4><img src="doc-files/reorg_5.gif" alt="reorganize section" align="bottom" border="0" height="67" width="332"></h4>
+
+<p>This chisel splits an ElevationGrid into a number of smaller
+ElevationGrids, each contained in their own <b>Transform</b>
+node. The resulting set of ElevationGrids is visually identical
+to the original larger ElevationGrid.</p>
+			<p>The <b>Number of columns</b> and <b>Number of rows</b> options
+control how the ElevationGrid gets split.</p>
+			<h4>Turn top level DEFs into Inlines</h4>
+			<p><img src="doc-files/exp4.gif" alt="" width="221" height="20" border="0"></p>
+			<p>Moves the contents of the top level DEFs into inline files (one per DEF). This Chisel splits the original file into a set of files. This can be useful if yuou want to optimise just one top-level branch of a scene later and then use the Uninline chisel to merge the files back into a single file again. Use with caution as converting into a set of inlines and then uninlining cannot always be achieved successfully -- in particular if there is interdependence between the children of the top-level nodes.</p>
+		</blockquote>
+		<h3><a name="Mutate"></a>MUTATE</h3>
+		<p>The chisels in this category modify the visual appearance of indexed face sets. Chisels in this category should be considered carefully before use. It is highly recommended that you save the reprganised file under a new name in case you need to revert to the original.</p>
+		<blockquote>
+		
+<h4>Point cloud</h4>
+
+<h4><img src="doc-files/mutate1.gif" alt="reorganize section" align="bottom" border="0" height="81" width="348"></h4>
+
+<p>This chisel converts IndexFaceSet shapes into IndexedPointSets (point cloud representations).</p>
+			<p>The <b>set emissiveColor to diffuseColor</b> option enables you to control the appearance of the resulting point cloud and <b>preserve original IFS in LOD level 0</b> options enables the generation of a LOD (level-of-detail) structure where the first level is the original indexed face set with a range in metres as supplied (default 10m).</p>
+			<h4>Wireframe</h4>
+			<h4><img src="doc-files/mutate2.gif" alt="reorganize section" align="bottom" border="0" height="80" width="355"></h4>
+
+<p>This chisel converts IndexFaceSet shapes into IndexedLineSets (wireframe representations).</p>
+
+<p>The <b>set emissiveColor to diffuseColor</b> option enables you to control the appearance of the resulting wireframe  and <b>preserve original IFS in LOD level 0</b> options enables the generation of a LOD (level-of-detail) structure where the first level is the original indexed face set with a range in metres as supplied (default 10m).</p>
+
+</blockquote>
+		<h2><a name="CLChisel"></a>Command Line Chisel</h2>
+		Chisel can be run from the command line using: <br>
+		<blockquote>
+			<tt>
+java -mx128m trapezium.chisel.CLChisel <b><i>report_file</i></b>
+<b><i>wrl_files</i></b><br>
+			</tt></blockquote>
+		<p>The <b><i>report_file</i></b> is an HTML report created from chiseling any file. It is created by selecting the &quot;File&quot; then &quot;Generate HTML Report&quot; menu option in the GUI version of chisel after chiseling a file. The default name for report files is based on the original wrl file name. For example, the file &quot;<tt>test1.wrl</tt>&quot; would have an html report named &quot;<tt>test1.chiseled.html</tt>&quot;</p>
+		<p>The <b><i>wrl_files</i></b> are a list of one or more &quot;<tt>.wrl</tt>&quot; files, with wild card characters allowed. For example, files can be specified as &quot;<tt>*.wrl</tt>&quot;.</p>
+
+<p>The command line version of chisel applies all the chisels in
+that report to all the files specified on the command line. The
+resulting files are named:
+
+</p><blockquote>
+			<p><tt>file.chiseled.wrl</tt></p>
+		</blockquote>
+or
+<blockquote>
+			<tt>file.chiseled.wrz</tt> (this is done if the &quot;-gzip&quot; flag is specified on the command line)</blockquote>
+
+The above naming convention can be avoided, and the original names
+preserved, by using the <b>-preserve</b> option.
+<p>The <b>options</b> allowed on the command line are:</p>
+
+<ul>
+<li><b>-gzip</b> saves file in gzip format, under name
+file.chiseled.wrz</li>
+
+<li><b>-output &lt;dirName&gt;</b> directs all files to be saved
+in a different output directory.</li>
+<li><b>-preserve</b> preserves original file names.  NOTE: use with
+caution, your original file is overwritten when using this option.</li>
+<li><b>-format</b> reformats the output.</li>
+</ul>
+	
+	</body>
+	</html>

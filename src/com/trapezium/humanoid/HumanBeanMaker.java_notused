@@ -1,0 +1,223 @@
+/*
+ * @(#)HumanBeanMaker.java
+ *
+ * Copyright (c) 1998-1999 by Trapezium Development LLC.  All Rights Reserved.
+ *
+ * The information in this file is the property of Trapezium Development LLC
+ * and may be used only in accordance with the terms of the license granted
+ * by Trapezium.
+ *
+ */
+package com.trapezium.humanoid;
+
+import com.trapezium.vrml.node.PROTOInstance;
+import com.trapezium.vrml.node.PROTObase;
+import com.trapezium.vrml.node.DEFUSENode;
+import com.trapezium.vrml.fields.Field;
+import com.trapezium.vrml.fields.FieldValue;
+import com.trapezium.vrml.fields.SFStringValue;
+import com.trapezium.vrml.ROUTE;
+import com.trapezium.bean.HumanBean;
+import com.trapezium.chisel.TokenPrinter;
+
+import com.trapezium.vorlon.LintVisitor;
+import com.trapezium.vrml.grammar.*;
+import com.trapezium.parse.TokenEnumerator;
+import com.trapezium.parse.InputStreamFactory;
+import com.trapezium.vrml.*;
+import java.util.Vector;
+import java.io.*;
+import com.trapezium.pattern.Visitor;
+
+/**
+ *  This class handles creating a HumanBean from a url.
+ *
+ *  @author          Johannes N. Johannsen
+ *  @version         1.0, 5 January 1999
+ *  @since           1.0
+ */
+public class HumanBeanMaker {
+    static public String version = "HumanBeanMaker v1.0";
+    static public String trapeziumHeader = "Copyright (c) 1999 by Trapezium Development LLC.  All rights reserved.";
+    static public String VRML2header = "#VRML V2.0 utf8";
+    static boolean extractFile = false;
+    static String extractFileName = null;
+    static boolean extractBehavior = false;
+    
+   /** Main program for using on command line
+    *
+    *  Command line parameters are:
+    *  <P>filename -- file or url
+    *
+    *  @param args      command line parameters
+    */
+	public static void main(String[] args) {
+
+        String listfile = null;
+        Vector additionalFiles = new Vector();
+		// initialize default field values
+		if ( args.length == 0 ) {
+			System.exit( 1 );
+		} else {
+			try {
+			    int starti = 0;
+			    HumanBeanMaker hbm = new HumanBeanMaker();
+			   
+				for ( int i = starti; i < args.length; i++ ) {
+					if ( args[i].compareTo( "-x" ) == 0 ) {
+					    extractFile = true;
+					    extractFileName = args[i+1];
+					    i++;
+					} else if ( args[i].compareTo( "-b" ) == 0 ) {
+					    extractBehavior = true;
+				    } else {
+						additionalFiles.addElement( args[i] );
+					}
+				}
+           		System.out.println( version );
+           		System.out.println( trapeziumHeader );
+  				for ( int i = 0; i < additionalFiles.size(); i++ ) {
+   					String fileName = (String)additionalFiles.elementAt( i );
+    				hbm.processUrl( fileName );
+   			    }
+			} catch ( FileNotFoundException e ) {
+				System.out.println( "Unable to open file '" + args[0] + "'" );
+			} catch ( ClassNotFoundException e ) {
+				System.out.println( "Java version 1.1 or later required to read gzip encoded files" );
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+   /**
+    *  Class constructor
+    *
+    *  @param url url to use in creating HumanBean
+    */
+   public HumanBeanMaker() { // String url ) {
+   }
+   
+	
+    /**
+     *  Process a url, actual processing depends on command line.
+     *
+     *  @param   inFile   String indicating the file or files to process
+     *
+     *  @return number of errors in the file
+     */
+	int processUrl( String inFile ) throws FileNotFoundException, IOException, ClassNotFoundException {
+   		System.out.println( "Searching for humanoid in '" + inFile + "'" );
+		try {
+			InputStream is = InputStreamFactory.getInputStream( inFile );
+			return( processInputStream( inFile, is ));
+		} catch ( NoClassDefFoundError eee ) {
+		    eee.printStackTrace();
+			return( 0 );
+		} catch( FileNotFoundException e ) {
+		    throw( e );
+		} catch( Exception e ) {
+		    e.printStackTrace();
+			return( 0 );
+		}
+	}
+
+    /**
+     *  Process a single input stream, either a vrml or html file.
+     *
+     *  @param   inFile  the url used to create the input stream
+     *  @param   is      the InputStream created from the url
+     */
+	int processInputStream( String inFile, InputStream is ) throws FileNotFoundException, IOException, ClassNotFoundException {
+		Scene vrmlScene = null;
+		boolean isHTML = false;
+		TokenEnumerator vrmlTokenEnumerator = new TokenEnumerator( is, inFile );
+		LintVisitor lv = new LintVisitor( vrmlTokenEnumerator );
+		String line0 = vrmlTokenEnumerator.getLineAt( 0 );
+		if ( line0.indexOf( VRML2header ) != 0 ) {
+			lv.showError( "Header must be '" + VRML2header + "'", 0, 0 );
+			return( 1 );
+		} else {
+			vrmlScene = new Scene( inFile, vrmlTokenEnumerator );
+			VRML97parser parser = new VRML97parser();
+			parser.Build( vrmlTokenEnumerator, vrmlScene );
+    		extractHumanBean( inFile, vrmlScene );
+		}
+	
+		return( lv.getErrorCount() );
+	}
+
+
+    void extractHumanBean( String inFile, Scene vrmlScene ) {
+        HumanBeanExtractor hbe = new HumanBeanExtractor( inFile, vrmlScene );
+        vrmlScene.traverse( hbe );
+        hbe.writeBean();
+        if ( extractFile ) {
+            hbe.generateVRML( extractFileName );
+        }
+    }
+}
+
+class HumanBeanExtractor extends Visitor {
+    HumanBean humanBean;
+
+    /** Class constructor.
+     *
+     *  @param inFile String indicating source file or url
+     *  @param scene parsed scene from url
+     */
+    HumanBeanExtractor( String inFile, Scene scene ) {
+        super( scene.getTokenEnumerator() );
+        humanBean = new HumanBean( inFile, scene );
+    }
+
+    public boolean visitObject( Object a ) {
+        if ( a instanceof PROTOInstance ) {
+            PROTOInstance pi = (PROTOInstance)a;
+            PROTObase pb = pi.getPROTObase();
+            if ( pb != null ) {
+                String baseId = pb.getId();
+                if ( baseId.compareTo( "Humanoid" ) == 0 ) {
+                    System.out.println( "Humanoid goes from " + pi.getFirstTokenOffset() + " to " + pi.getLastTokenOffset() );
+                    TokenPrinter tp = new TokenPrinter( dataSource, humanBean.getHumanoidTokenEnumerator() );
+                    tp.printRange( pi.getFirstTokenOffset(), pi.getLastTokenOffset(), true );
+                } else if ( baseId.compareTo( "Joint" ) == 0 ) {
+                    Field name = pi.getField( "name" );
+                    if ( name != null ) {
+                        FieldValue fv = name.getFieldValue();
+                        if ( fv instanceof SFStringValue ) {
+                            SFStringValue sfsv = (SFStringValue)fv;
+                            String stringName = sfsv.getStringValue();
+                            if ( stringName != null ) {
+                                VrmlElement hroot = pi;
+                                VrmlElement parent = pi.getParent();
+                                if ( parent instanceof DEFUSENode ) {
+                                    DEFUSENode dun = (DEFUSENode)parent;
+                                    humanBean.associate( dun.getId(), stringName );
+                                    hroot = dun;
+                                }
+                                if ( stringName.compareTo( "HumanoidRoot" ) == 0 ) {
+                                    System.out.println( "HumanoidRoot goes from " + pi.getFirstTokenOffset() + " to " + pi.getLastTokenOffset() );
+                                    TokenPrinter tp = new TokenPrinter( dataSource, humanBean.getHumanoidRootTokenEnumerator() );
+                                    tp.printRange( hroot.getFirstTokenOffset(), hroot.getLastTokenOffset(), true );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else if ( a instanceof ROUTE ) {
+            humanBean.saveROUTE( (ROUTE)a );
+        }
+        return( true );
+    }
+
+    public void writeBean() {
+        humanBean.analyzeBehaviors();
+        humanBean.serialize();
+    }
+
+    public void generateVRML( String fileName ) {
+        humanBean.generateVRML( fileName );
+    }
+}

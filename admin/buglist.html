@@ -1,0 +1,139 @@
+<HTML>
+
+<HEAD><TITLE>Chisel Bugs Reported</TITLE></HEAD>
+
+<BODY>
+<H1>Reported Chisel Bugs, 12 October 2010</H1>
+
+<P>The following bugs have been reported, but not yet fixed.</P>
+
+<p>See the <A HREF="fixedlist.html">fixed list</A> for bugs that have been reported and fixed.</p>
+
+<p>See the <A HREF="requestslist.html">requests list</A> for items previously registered as &quot;bugs&quot; which have now been classified as requests.</p>
+
+<PRE>
+    Bug 52: edge removal with DEF/USE of coords may tear edge boundaries
+
+    Bug 60: IndexedLineSets generated from IndexedFaceSets have each edge repeated twice
+
+    Bug 76: fetch doesn't create correct remote wrl url when html has path to another html
+
+    Bug 91: site fetching failed
+
+    Bug 92: Background node with no skyColor not reported as error
+
+    Bug 94: unnecessary interpolator values reported not exactly same as ones removed
+
+    Bug 104: clicking in viewer makes green CLEAN button brown
+
+    Bug 110: Remove unused values checked, but count is 0
+
+    Bug 112: chisel report sometimes shows 100% next to Creating DEF/USE node
+
+    Bug 113: didn't fetch single quote file name in javascript
+
+    Bug 118: some repeated and unused values never removed
+
+    Bug 123: PROTO with exposedField named "set_xxxx", produces bogus error message
+
+    Bug 127: exception when stop hit in middle of clean sequence, no error however
+
+    Bug 128: traversing scene slow on some files
+
+    Bug 131: vorlon -url flag first doesn't work
+
+    Bug 141: undo reload failed, lots of files, then closed some, then opened one
+
+    Bug 157: remove empty IFS when USEing DEFfed empty IFS, error
+
+    Bug 158: dies in highly nested files (vorlon too... stack overflow)
+    
+    Bug 164: turn shapes into inline, url was absolute instead of relative
+
+    Bug 168: serialized files not cleaned up on exit (may be related to more than one open)
+
+    Bug 185: vorlon *.wrz appears to act like vorlon firstfilename.wrl
+
+    Bug 186: vorlon filename.wrz appears to act like vorlon filename.wrl
+   
+    Bug 228: function and function name on separate line, reported as missing function error
+
+    Bug 229: if url in html is complete url (not relative) fetch seems to get it in wrong place
+
+    Bug 233: uninline generated names conflict with generated save as names
+
+    Bug 235: some useless nodes cannot be removed
+
+    Bug 243: file save as appears to do nothing after fetch
+
+    Bug 244: file name should give indication it is changed but not saved "*"
+
+    Bug 249: chisel does not remove duplicate ROUTEs
+
+    Bug 251: when warnings are disabled, default fields not detected or removed
+
+    Bug 254: two PROTOs with same name not reported as error
+
+    Bug 255: javascript in script node, mistaken error message, only with "-url" flag
+
+    Bug 258: didn't see v1 turn to v2 after CLEAN
+
+    Bug 260: uninline doesn't detect inlines described in PROTO
+
+    Bug 261: uninline in command line prints word "null", no associated problem
+
+    Bug 265: elevation grid splitter produces garbage with long line file
+
+    Bug 269: sometimes undo doesn't work
+
+    Bug 271: multibyte utf8 characters not handled correctly
+
+    Bug 274: undo after edit, then format screws up file
+
+    Bug 280: format merges ROUTE lines
+
+    Bug 308: MUTATE button doesn't turn green when option selected
+
+    Bug 310: fetching while a fetch is active causes some files to not be fetched
+
+    Bug 313: fetching jpg directly tries to display it as vrml file
+
+    Bug 314: invalid nodes in switch not flagged as errors
+
+    Bug 315: vorlon fails to check script url
+
+    Bug 317: clean produces error in PROTO
+
+    Bug 319: undo should stop at file save boundaries
+</PRE>
+
+<P>The following are considered obsolete (cannot be reproduced) and will not be addressed unless someone can reproduce them on modern systems:</P>
+
+<PRE>
+    Bug 33: pane display gets messed up when chiseling starts
+	
+    Bug 50: REDUCE option checked, click on REDUCE, behaves as if no options checked
+    
+    Bug 103: after closing last file, header line still has info
+    
+    Bug 138: got debug message &quot;processedFile and scene have different TokenEnumerator&quot;
+
+    Bug 156: clicking on category when no file loaded says &quot;chisels already running&quot;
+
+    Bug 215: dragging file onto chisel shortcut, mutators don't appear
+
+    Bug 252: create DEF/USE very slow on some files
+
+    Bug 275: scroll down a_nurbs.wrl, doesn't scroll (because warning every line on short file)
+    
+    Bug 278: colors of options and unlock windows not right on NT (ok on win95)
+
+    Bug 306: immediately after unlock, mutators still unavailable
+
+    Bug 307: with &quot;chisel.jar&quot; version, no progress seen on new mutators (exception... related to additional plugins)
+ 
+    Bug 318: character color changes as cursor moves in Script node
+</PRE>
+
+	</BODY>
+</HTML>

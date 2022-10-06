@@ -1,0 +1,356 @@
+/*
+ * @(#)BehaviorBean.java
+ *
+ * Copyright (c) 1999 by Trapezium Development LLC.  All Rights Reserved.
+ *
+ * The information in this file is the property of Trapezium Development LLC
+ * and may be used only in accordance with the terms of the license granted
+ * by Trapezium.
+ *
+ */
+package com.trapezium.bean;
+
+import com.trapezium.parse.TokenEnumerator;
+import com.trapezium.humanoid.Humanoid_1_0;
+import com.trapezium.vrml.ROUTE;
+import com.trapezium.vrml.VrmlElement;
+import com.trapezium.vrml.Scene;
+import com.trapezium.vrml.node.Node;
+import com.trapezium.chisel.TokenPrinter;
+import com.trapezium.vrml.node.DEFUSENode;
+import com.trapezium.vrml.node.PROTOInstance;
+import com.trapezium.vrml.node.PROTObase;
+
+import java.io.*;
+import java.util.Hashtable;
+import java.util.Enumeration;
+import java.util.Vector;
+
+/** The BehaviorBean contains the set of DEFs and associated ROUTEs for a particular
+ *  behavior.  At the moment, it uses an "ultimate" root, which is the first ROUTE
+ *  in a chain of ROUTEs.  This might not be appropriate, since this might be some
+ *  sort of sensor with associated geometry.
+ *
+ *  An alternate approach, which might be better in other cases is to just use the
+ *  first TimeSensor encountered as the "ultimate" root.
+ *
+ */
+public class BehaviorBean implements java.io.Serializable, Humanoid_1_0 {
+
+    // the DEFs used by this behavior
+    Vector defs;
+    
+    // the ROUTEs used by this behavior
+    Vector routes;
+    
+    // no longer used, but needed if we include touch sensor stuff
+    Vector sensorContainingNodes;
+    Hashtable defToJoint;
+    Hashtable jointToDef;
+    ROUTE ultimate;
+    
+    // modification points are where token offsets have shifted
+    int[] modificationPoints;
+    int[] modificationValue;
+    int mpidx;
+    void addModificationPoint( int offset, int value ) {
+        modificationPoints[mpidx] = offset;
+        modificationValue[mpidx] = value;
+        mpidx++;
+    }
+    int getModifiedStartValue( int offset ) {
+        for ( int i = 0; i < mpidx; i++ ) {
+            if ( offset > modificationPoints[i] ) {
+                offset += modificationValue[i];
+            }
+        }
+        return( offset );
+    }
+    int getModifiedEndValue( int offset ) {
+        for ( int i = 0; i < mpidx; i++ ) {
+            if ( offset > (modificationPoints[i] + modificationValue[i])) {
+                offset += modificationValue[i];
+            }
+        }
+        return( offset );
+    }
+    
+    public BehaviorBean( ROUTE ultimate, Hashtable defToJoint, Hashtable jointToDef ) {
+        modificationPoints = new int[100];
+        modificationValue = new int[100];
+        mpidx = 0;
+        this.ultimate = ultimate;
+        routes = new Vector();
+        defs = new Vector();
+        sensorContainingNodes = new Vector();
+        this.defToJoint = defToJoint;
+        this.jointToDef = jointToDef;
+    }
+    
+    private void writeObject( ObjectOutputStream stream ) throws java.io.IOException  {
+        System.out.println( "BehaviorBean.writeObject" );
+        stream.defaultWriteObject();
+    }
+    
+    /** Save ROUTE info. */
+    public void saveROUTE( ROUTE route ) {
+        if ( routes.indexOf( route ) == -1 ) {
+            routes.addElement( route );
+        }
+    }
+
+    /** Save DEF info, but only for DEFs that aren't joints. */
+    public void saveDEF( String defName ) {
+        if ( defs.indexOf( defName ) == -1 ) {
+            if ( defToJoint.get( defName ) == null ) {
+                defs.addElement( defName );
+            }
+        }
+    }
+
+    /** Generate VRML for this, using DEF names from the humanoid
+     *  if the ROUTE is referring to a Joint.
+     *
+     *  @param humanBean used to resolve Joint DEF names to one used by 
+     *     HumanBean in the case where the behavior was originally applied
+     *     to a different humanoid
+     *  @param ps where to print the data
+     *  @param behaviorNumber used to rename behaviors
+     *  @param defsGenerated list of DEFs that text has been generated for,
+     *     to prevent repeatedly generating text for a DEF that was used
+     *     in more than one behavior.
+     */
+    public void generateVRML( HumanBean humanBean, PrintStream ps, int behaviorNumber, Hashtable defsGenerated, Vector generatedRoutes, Hashtable generatedPROTOs ) {
+        String behaviorName = "hb_behavior_" + behaviorNumber;
+        Scene baseScene = (Scene)ultimate.getRoot();
+        replaceDEF( ultimate.getSourceDEFname(), behaviorName, baseScene );
+        ps.println( "#" );
+        ps.println( "# Generating ROUTEs for ultimate " + ultimate.getSourceDEFname() + " TO " + ultimate.getDestDEFname() );
+        ps.println( "#" );
+        generateDEFs( ps, defsGenerated, generatedPROTOs, baseScene );
+        int numberRoutes = routes.size();
+        Hashtable beanJointToDef = humanBean.getJointToDef();
+        for ( int i = 0; i < numberRoutes; i++ ) {
+            ROUTE r = (ROUTE)routes.elementAt( i );
+            if ( generatedRoutes.indexOf( r ) == -1 ) {
+                generatedRoutes.addElement( r );
+                generateRoute( ps, beanJointToDef, r );
+            }
+        }
+    }
+    
+    void replaceDEF( String originalName, String newName, Scene scene ) {
+        if ( originalName.compareTo( newName ) == 0 ) {
+            return;
+        }
+        TokenEnumerator te = scene.getTokenEnumerator();
+        DEFUSENode dun = scene.getDEF( originalName );
+        if ( dun != null ) {
+            int offset = getModifiedStartValue( dun.getFirstTokenOffset() + 1 );
+            te.replace( offset, newName );
+            Node n = dun.getNode();
+
+            // possibly def is PROTO for TimeSensor
+            if ( n instanceof PROTOInstance ) {
+                PROTOInstance pi = (PROTOInstance)n;
+                PROTObase pb = pi.getPROTObase();
+                n = pb.getPROTONodeType();
+                if ( n == null ) {
+                    return;
+                }
+            }
+            // make TimeSensor fields uniform
+            int oldSize = n.getLastTokenOffset() - n.getFirstTokenOffset();
+            System.out.println( "old range " + n.getFirstTokenOffset() + " to " + n.getLastTokenOffset() );
+//            System.out.println( "3678 is '" + te.toString( 3678 ) + "'" );
+//            System.out.println( "3681 is '" + te.toString( 3681 ) + "'" );
+            int originalLast = n.getLastTokenOffset();
+            if ( n.getBaseName().compareTo( "TimeSensor" ) == 0 ) {
+                try {
+                    n.setField( "startTime 0" );
+                    n.setField( "stopTime 0" );
+                    n.setField( "enabled FALSE" );
+                } catch ( Exception e ) {
+                    e.printStackTrace();
+                    System.out.println( "error setting TimeSensor fields" );
+                }
+            }
+            int newSize = n.getLastTokenOffset() - n.getFirstTokenOffset();
+            if (( newSize - oldSize ) != 0 ) {
+                addModificationPoint( originalLast, newSize - oldSize );
+            }
+            System.out.println( "new range " + n.getFirstTokenOffset() + " to " + n.getLastTokenOffset() );
+            System.out.println( "added modification point " + originalLast + ", size " + (newSize-oldSize));
+//            System.out.println( "3678 is '" + te.toString( 3678 ) + "'" );
+//            System.out.println( "3681 is '" + te.toString( 3681 ) + "'" );
+        }
+        int numberRoutes = routes.size();
+        for ( int i = 0; i < numberRoutes; i++ ) {
+            ROUTE r = (ROUTE)routes.elementAt( i );
+            if ( r.getSourceDEFname().compareTo( originalName ) == 0 ) {
+                int offset = getModifiedStartValue( r.getFirstTokenOffset() + 1 );
+                te.replace( offset, newName + "." + r.getSourceFieldName() );
+                r.setSourceDEFname( newName );
+            }
+        }
+    }
+
+    /** Generate text for all the DEFs used by this behavior.  The DEFs listed
+     *  in this behavior are only the ones that are used by the behavior, but
+     *  are not Joint DEFs.
+     */
+    void generateDEFs( PrintStream ps, Hashtable defsGenerated, Hashtable generatedPROTOs, Scene scene ) {
+        int numberDEFs = defs.size();
+        TokenEnumerator te = scene.getTokenEnumerator();
+        for ( int i = 1; i < numberDEFs; i++ ) {
+            String defName = (String)defs.elementAt( i );
+            generateDEF( ps, defName, scene, te, defsGenerated, generatedPROTOs );
+        }
+        String ultimateDEF = (String)defs.elementAt( 0 );
+        generateDEF( ps, ultimateDEF, scene, te, defsGenerated, generatedPROTOs );
+    }
+    
+    /** Generate text for a single DEF.  If that DEF is totally contained in another DEF,
+     *  then generate text for that other DEF (unless it was done already).
+     *
+     *  @param ps PrintStream destination of generated text
+     *  @param defName the name of the DEF to generate
+     *  @param scene the Scene containing the DEF
+     *  @param te source of text
+     *  @param defsGenerated table of DEFs already generated to prevent duplicate DEFS
+     *     (NOTE: still one DEF containing another will result in duplicates)
+     */
+    void generateDEF( PrintStream ps, String defName, Scene scene, TokenEnumerator te, Hashtable defsGenerated, Hashtable generatedPROTOs ) {
+        if ( defsGenerated.get( defName ) != null ) {
+            return;
+        }
+        defsGenerated.put( defName, defName );
+        VrmlElement defNode = scene.getDEF( defName );
+        if ( defNode == null ) {
+            return;
+        }
+        if ( defNode instanceof DEFUSENode ) {
+            DEFUSENode dun = (DEFUSENode)defNode;
+            Node n = dun.getNode();
+            if ( n instanceof PROTOInstance ) {
+                PROTOInstance pi = (PROTOInstance)n;
+                PROTObase pb = pi.getPROTObase();
+                String pbName = pb.getId();
+                if ( pbName != null ) {
+                    if ( pbName.compareTo( "Joint" ) != 0 ) {
+                        if ( generatedPROTOs.get( pb ) == null ) {
+                            generatedPROTOs.put( pb, pb );
+                            TokenPrinter tp = new TokenPrinter( te, new TokenEnumerator() );
+                            tp.printRange( getModifiedStartValue( pb.getFirstTokenOffset() ), 
+                                getModifiedStartValue( pb.getLastTokenOffset() ), true );
+                            tp.flush();
+                            tp.saveDataSink( ps );
+                            ps.println( "#" );
+                            ps.println( "# end of PROTO from " + pb.getFirstTokenOffset() + " to " + pb.getLastTokenOffset() );
+                        }
+                    }
+                }
+            }
+        }
+        DEFUSENode containingDEF = getContainingDEF( scene, defNode.getFirstTokenOffset() );
+        if ( containingDEF != null ) {
+            while ( true ) {
+                defNode = containingDEF;
+                String name = containingDEF.getId();
+                System.out.println( "DEF contained in '" + name + "'" );
+                if ( defsGenerated.get( name ) != null ) {
+                    return;
+                }
+                defsGenerated.put( name, name );
+                DEFUSENode ctest = getContainingDEF( scene, containingDEF.getFirstTokenOffset() );
+                if ( ctest == null ) {
+                    break;
+                } else {
+                    containingDEF = ctest;
+                }
+            }
+        }
+        Node test = getSensorContainingNode( defNode.getFirstTokenOffset() );
+        if ( test != null ) {
+            defNode = test;
+        }
+        TokenPrinter tp = new TokenPrinter( te, new TokenEnumerator() );
+        System.out.println( "def node goes from " + defNode.getFirstTokenOffset() + " to " + defNode.getLastTokenOffset() );
+        System.out.println( "tokens are: " + te.toString( defNode.getFirstTokenOffset() ) + ", then " + te.toString( defNode.getFirstTokenOffset() + 1 ));
+
+        tp.printRange( getModifiedStartValue( defNode.getFirstTokenOffset()), 
+            getModifiedEndValue( defNode.getLastTokenOffset() ), true );
+        tp.flush();
+        tp.saveDataSink( ps );
+        ps.println( "#" );
+        ps.println( "# end of DEF " + defNode.getFirstTokenOffset() + " to " + defNode.getLastTokenOffset() );
+        ps.println( "# modified:  " + getModifiedStartValue( defNode.getFirstTokenOffset()) + " to " + getModifiedEndValue( defNode.getLastTokenOffset()) );
+    }
+        
+    /** Get the non-DEFfed node that contains this one, this is used
+     *  for the case where we have to also generate a sensor node parent,
+     *  since the sensor only makes sense in the context of its parent.
+     */
+    Node getSensorContainingNode( int offset ) {
+//        System.out.println( "Searching for sensor containing DEFs" );
+        int numberSensorContainingNodes = sensorContainingNodes.size();
+        for ( int i = 0; i < numberSensorContainingNodes; i++ ) {
+            Node n = (Node)sensorContainingNodes.elementAt( i );
+            if (( n.getFirstTokenOffset() < offset ) && ( n.getLastTokenOffset() > offset )) {
+//                System.out.println( "FOUND ONE" );
+                return( n );
+            }
+        }
+//        System.out.println( "Didn't FIND ONE" );
+        return( null );
+    }
+    
+    /** Add a sensor containing node */
+    public void addSensorContainingNode( Node n ) {
+        sensorContainingNodes.addElement( n );
+    }
+    
+    /** Get the DEF that contains another DEF
+     *
+     *  @param scene the authority on all DEFs
+     *  @param defOffset the tokenOffset of the DEF to check, it is contained in
+     *     another DEF if that other DEF's token offsets surround it
+     *  
+     *  @return the first containing DEF found, or null if none
+     */
+    DEFUSENode getContainingDEF( Scene scene, int defOffset ) {
+        int numberDEFs = defs.size();
+//        System.out.println( "getContainingDEF for offset " + defOffset );
+        for ( int i = 0; i < numberDEFs; i++ ) {
+            String defName = (String)defs.elementAt( i );
+            DEFUSENode test = scene.getDEF( defName );
+            if ( test != null ) {
+                if (( test.getFirstTokenOffset() < defOffset ) && ( test.getLastTokenOffset() > defOffset )) {
+                    return( test );
+                }
+            }
+        }
+        return( null );
+    }
+        
+
+    /** Generate text for a ROUTE
+     *
+     *  @param ps PrintStream destination for generated text
+     *  @param beanJointToDef table that maps Joint names to DEF names for a particular HumanBean
+     *  @param r the ROUTE to convert to text
+     */
+    void generateRoute( PrintStream ps, Hashtable beanJointToDef, ROUTE r ) {
+        String source = r.getSourceDEFname();
+        String dest = r.getDestDEFname();
+        String jointSource = (String)defToJoint.get( source );
+        String jointDest = (String)defToJoint.get( dest );
+        if ( jointSource != null ) {
+            source = (String)beanJointToDef.get( jointSource );
+        }
+        if ( jointDest != null ) {
+            dest = (String)beanJointToDef.get( jointDest );
+        }
+        ps.println( "ROUTE " + source + "." + r.getSourceFieldName() + " TO " + dest + "." + r.getDestFieldName() );
+    }
+}

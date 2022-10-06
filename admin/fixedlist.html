@@ -1,0 +1,489 @@
+<HTML>
+
+	<HEAD><TITLE>Chisel Bugs Fixed</TITLE></HEAD>
+
+	<body>
+		<h1>Chisel Bugs fixed, as of 12 October 2010</h1>
+		The following bugs have been fixed.
+		<p>See the <a href="buglist.html">bug list</a> for bugs which have been reported but not yet fixed.</p>
+		<p><a href=#b80>Fixed in Build 80</a> (Original Trapezium versions)<br>
+			<a href=#b81>Fixed in Build 81</a><br>
+			<a href=#b82>Fixed in Build 82</a><br>
+			<a href=#b83>Fixed in Build 83</a><br>
+			<a href=#b84>Fixed in Build 84</a><br>
+			<a href=#b85>Fixed in Build 85</a><br>
+			<a href=#b86>Fixed in Build 86</a><br>
+			<a href=#b87>Fixed in Build 87</a><br>
+			<a href=#b88>Fixed in Build 88</a><br>
+			<a href=#b89>Fixed in Build 89</a><br>
+			<a href=#b90>Fixed in Build 90</a><br>
+			<a href=#b91>Fixed in Build 91</a><br>
+			<a href=#b92>Fixed in Build 92</a><br>
+			<a href=#b93>Fixed in Build 93</a><br>
+			<a href=#b94>Fixed in Build 94</a><br>
+			<a href=#b95>Fixed in Build 95</a><br>
+			<a href=#b96>Fixed in Build 96</a><br>
+			<a href=#b97>Fixed in Build 97</a><br>
+			<a href=#b98>Fixed in Build 98</a><br>
+			<a href=#b99>Fixed in Build 99</a><br>
+			<a href=#b100>Fixed in Build 100</a><br>
+			<a href=#b101>Fixed in Build 101</a><br>
+			<a href=#b102>Fixed in Build 102</a><br>
+			<a href=#b103>Fixed in Build 103</a><br>
+			<a href=#b104>Fixed in Build 104</a><br>
+			<a href=#b105>Fixed in Build 105</a><br>
+			<a href=#b106>Fixed in Build 106</a><br>
+			<a href=#b210>Fixed in Build 210</a> (M. Louka's &quot;HVRC Edition&quot; versions)<br>
+			<a href=#b211>Fixed in Build 211</a><br>
+			<a href=#b212>Fixed in Build 212</a><br>
+		</p>
+		<H4><A NAME="b81"></A>Fixed in Build 81</H4>
+		<PRE>
+    Bug 1: DEF/USE with PROTO corrupts file
+
+</pre>
+		<h4><a name="b82"></a>Fixed in Build 82</h4>
+		<pre>
+    Bug 20: undo and redo show progress
+
+    Bug 21: unnecessary interpolator automatic check missing
+
+</pre>
+		<h4><a name="b83"></a>Fixed in Build 83</h4>
+		<pre>
+    Bug 5:  CoplanarTriToQuad corrupts file
+
+    Bug 6: fetching html creates incorrect local directories
+
+    Bug 15: save in unix format
+
+    Bug 16: ElevationGridSplitter messes up xSpacing and zSpacing if original had &quot;.&quot;
+
+</pre>
+		<h4><a name="b84"></a>Fixed in Build 84</h4>
+		<pre>
+    Bug 2:  format has problems with quoted strings
+
+    Bug 11: CLEAN, then all REDUCE options, then CLEAN, creates errors
+
+    Bug 12: CLEAN doesn't remove all repeated values
+
+    Bug 13: pane containing text doesn't redraw after chisels are finished
+
+    Bug 19: FORMAT says &quot;Elapsed time: 0 seconds&quot;
+
+    Bug 22: index fields corresponding to coordIndex, with extra values at end not cleaned
+
+    Bug 25: remove smallest tri wipes out texCoordIndex
+
+</pre>
+		<h4><a name="b85"></a>Fixed in Build 85</h4>
+		<pre>
+    Bug 3: tabs every N spaces option
+
+    Bug 27: edge removal polygon reduction, added disable bounding box for USE coord cases
+
+    Bug 28:  shorten DEF-names chisel needed, proto field name shortener(?)
+
+    Bug 30: interpolators with only one key not removed
+
+    Bug 35: New chisel, PROTO maker for interpolators
+
+    Bug 49: DEF/USE coord node, polygon reduction only happens on first IFS (one with DEF)
+
+</pre>
+		<h4><a name="b86"></a>Fixed in Build 86</h4>
+		<pre>
+    Bug 4:  need better progress reporting on large files
+
+    Bug 24: numeric resolution chisel reports 1 value node when there are 2 (Coord &amp; TexCoord)
+
+    Bug 32: &quot;.mov&quot; file fetched, when default is off (maybe filter is wrong, only mpeg)
+
+    Bug 39: Make automatic clean after chiseling an option
+
+    Bug 55: uninline doesn't rename ROUTEs DEF names
+
+    Bug 63: coplanar tri to quad test bug5.wrl fails (test script bug failed to detect)
+
+</pre>
+		<h4><a name="b87"></a>Fixed in Build 87</h4>
+		<pre>
+    Bug 10: Uninline when uninlined file has a PROTO, need to move the PROTO to 
+
+    Bug 38: Error message in status line should not include &quot;^&quot; and spaces
+
+    Bug 41: HTML report sometimes puts &quot;*&quot; for % reduction
+
+    Bug 53: command line uninline doesn't behave same as GUI
+
+    Bug 57: uninline requires ROUTEs on lines by themselves
+
+    Bug 64: numeric condense should work on Extrusion and ElevationGrid
+
+    Bug 68: Create PROTOs for interpolators corrupts file
+
+    Bug 71: bogus error message on MovieTexture.duration_changed ROUTE
+
+    Bug 72: nullpointer exception during fetch
+
+    Bug 74: chisel documentation should describe how to start chisel for large files
+
+    Bug 75: shorten DEF names corrupts file
+
+</pre>
+		<h4><a name="b88"></a>Fixed in Build 88</h4>
+		<pre>
+    Bug 73: when chisel starts after install, status line says &quot;Unable to load chisel settings...&quot;
+
+    Bug 79: undo of uninline doesn't work, don't get versions as expected
+
+</pre>
+		<h4><a name="b89"></a>Fixed in Build 89</h4>
+		<pre>
+    Bug 17: wrl file with very long lines doesn't parse
+
+    Bug 43: warning count says 1000 when there are more
+
+    Bug 77: chisel.exe staring with no JVM installed, exits without any error message
+
+    Bug 83: CLEAN corrupts file, IFS with IS fields in PROTO
+
+    Bug 84: all CONDENSORS corrupts file
+
+</pre>
+		<h4><a name="b90"></a>Fixed in Build 90</h4>
+		<pre>
+    Bug 9: bad header error not shown
+
+    Bug 31: Warning of repeated value, but not counted or removed
+
+    Bug 34: HTML reports get wrong file name after fetch
+
+    Bug 45: chisels in GUI categories need to be customizable, plugin architecture
+
+    Bug 47: After file save as, see &quot;R 0 bytes&quot; instead of size until click in viewer pane
+
+    Bug 70: - next/prev error starts from first/last displayed line, or current error line, and doesn't scroll if line is visible
+
+    Bug 85: uninline doesn't handle EXTERNPROTO correctly
+
+    Bug 86: unused/repeated texture coordinate not counted, so CLEAN not turned on automatically
+
+    Bug 87: wireframe with DEF/USE doesn't work
+
+    Bug 88: when there is only one error, it can only be located once
+
+    Bug 90: reformatting doesn't handle EXTERNPROTO fields correctly
+
+    Bug 96: after file save as name not changed everywhere (missed adding to bug list when received)
+
+    Bug 97: reformat can cause exception
+
+    Bug 100: request for top level DEF to Inline chisel
+
+    Bug 102:  after non gzip save as, original gzip file still marked as gzipped
+
+</pre>
+		<h4><a name="b91"></a>Fixed in Build 91</h4>
+		<pre>
+    Bug 8: after clicking on stop during fetch, sometimes fetch seems to continue
+
+    Bug 56: when opening file that doesn't exist status line just says &quot;closing file...&quot;
+
+    Bug 66: mutate doesn't remove IFS syntax when creating wireframe
+
+    Bug 107: yet another filter, mpg needs to be added to fetch extensions
+
+    Bug 108: trackPoint_changed spelling check incorrect (using 'trackpoint_changed')
+
+    Bug 111: After generating html report, file save as has that name for default
+
+    Bug 114: fetch cancel gives error message on status line
+
+    Bug 115: cancelled fetch, then opened file, file closed immediately, second open was OK
+
+    Bug 116: lots of TextureCoordinate, checking phase very slow
+
+    Bug 117: file says 100,000+ repeated value refs, but only has 27000 lines
+
+    Bug 121: SGI/Mac java.lang.NoClassDefFoundError: trapezium/chisel/gui/ActionImpl
+
+    Bug 122: -nowarning  vorlon list=filelist causes later flags to be ignored
+
+    Bug 125: disable warnings, still see error summary warnings
+
+    Bug 126: javascript function check, only finds one function per line
+
+    Bug 130: vorlon.exe returns error code, inconvenient for shell scripts
+
+    Bug 133: removing empty IndexedFaceSets should move to CONDENSERs, 
+
+    Bug 134: exception during creating index field
+
+    Bug 136: bogus debugging message appears adjusting interpolator resolution for protozoa file
+
+    Bug 137: save as should create reasonable default name (&quot;_2&quot;, &quot;_3&quot;, etc.)
+
+    Bug 142: clean produces error on file with children without [] with empty IFS child
+
+    Bug 143: default gzip save file name should be file.chiseled.wrz
+
+    Bug 148: remove empty IFS messes up cleaned ExampleBeamDynamic.wrl
+
+    Bug 151: green button, use to indicate that category option changed, but category not run yet
+
+    Bug 154: uncheck all category entries after the category has run
+
+</pre>
+		<h4><a name="b92"></a>Fixed in Build 92</h4>
+		<pre>
+    Bug 159: split IFS by color leaves off ] &amp; }
+
+    Bug 160: split IFS by color leaves color index, can replace with diffuseColor
+
+    Bug 169: chisel build 91 doesn't run
+
+</pre>
+		<h4><a name="b93"></a>Fixed in Build 93</h4>
+		<pre>
+    Bug 165: turn shapes into inline, should calculate bboxSize &amp; bboxCenter
+
+    Bug 170: uninline creates errors
+
+    Bug 172: remove smallest triangles creates errors
+
+    Bug 173: icon setting exception on unix systems
+
+</pre>
+		<h4><a name="b94"></a>Fixed in Build 94</h4>
+		<pre>
+    Bug 174: show null pointer exception on SGI &amp; Solaris systems (mac OK)
+
+</pre>
+		<h4><a name="b95"></a>Fixed in Build 95</h4>
+		<pre>
+    Bug 166: need 'Join shapes by color' chisel
+
+    Bug 175: &quot;save as&quot; filename modifications while generating HTML report are ignored
+
+    Bug 180: change default html report filename to worldname.chiseled.html to match worldname.wrl
+
+    Bug 181: long filename gets truncated in top header of .html report
+
+    Bug 182: consider original/chiseled file links in html report
+
+    Bug 184: vorlon *.wr? doesn't check *.wrl and *.wrz, fails instead
+
+    Bug 187: if all faces in IFS are triangle, convex FALSE should give warning
+
+    Bug 188: cleaning dup coord when there is bad index gives exception
+
+    Bug 192: chisel to remove unused TimeSensors
+
+</pre>
+		<h4><a name="b96"></a>Fixed in Build 96</h4>
+		<pre>
+    Bug 206: + needs to turn to - after expanding chisel area
+
+</pre>
+		<h4><a name="b97"></a>Fixed in Build 97</h4>
+		<pre>
+    Bug 207: IFS face with non-consecutive repeated index, &quot;Remove duplicate index values&quot; creates visual problems
+
+</pre>
+		<h4><a name="b98"></a>Fixed in Build 98</h4>
+		<pre>
+    Bug 109: root node illegal nodes not flagged as illegal
+
+    Bug 191: option to ignore unused DEFs
+
+    Bug 211: vorlon -out file.wrl saves output in file.out
+
+    Bug 212: chisel slow serializing
+
+    Bug 214: clean created errors when no edges in face
+
+</pre>
+		<h4><a name="b99"></a>Fixed in Build 99</h4>
+		<pre>
+    Bug 178: add listing of compression settings to html report
+
+    Bug 217: after html report generated, status line says &quot;Finished saving file&quot;, should say name of report file
+
+</pre>
+		<h4><a name="b100"></a>Fixed in Build 100</h4>
+		<pre>
+    Bug 18: when chisel does nothing, no need to check syntax
+
+    Bug 218: VALIDATE and FORMAT settings should be preserved
+
+    Bug 219: humanoid check no longer available
+
+    Bug 226: 3dsmax export adds useless Appearance nodes to Shapes with textured IFSes
+
+    Bug 227: chisel to remember tabstops
+
+    Bug 231: remove unused PROTO interface field creates ROUTE errors
+
+    Bug 232: clean messes up colors
+
+    Bug 234: clean  creates duplicate diffuseColor
+
+    Bug 236: colorIndex with no [], single color to diffuseColor fails
+
+    Bug 242: move bad routes to end of file should not move ROUTEs in a PROTO
+
+</pre>
+		<h4><a name="b101"></a>Fixed in Build 101</h4>
+		<pre>
+    Bug 179: consider making displayed text of html report the same as defaults modification textfile for command line use
+
+    Bug 190: command line chisel should have gzip save option as default
+
+    Bug 194: ability to do: chisel *.wrl specialsettings.ini
+
+    Bug 225: mac can't open options and fetch dialogs, get exceptions
+
+    Bug 245: split IFS by connectivity very slow appears hung on large IFS
+
+    Bug 248: vorlon does not detect duplicate ROUTEs
+
+    Bug 250: files with very very long lines slow to display
+
+    Bug 256: command line chisel, make gzip an option (now happens with &quot;-gzip&quot; flag only)
+
+</pre>
+		<h4><a name="b102"></a>Fixed in Build 102</h4>
+		<pre>
+    Bug 239: fetch should keep a log of what it did (just tracking status line messages is OK)
+
+    Bug 253: illegal VRML not detected by vorlon
+
+    Bug 257: command line chisel, output dir option
+
+    Bug 259: plugins mistakenly allowed
+
+</pre>
+		<h4><a name="b103"></a>Fixed in Build 103</h4>
+		<pre>
+    Bug 29: cursor doesn't appear in viewer window
+
+    Bug 268: index optimizer exception when coordIndex face count &lt; normal count
+
+    Bug 270: format not selectable under &quot;Process&quot; menu
+
+    Bug 271: undo of an inserted newline doesn't repaint, so looks like it didn't work
+
+    Bug 272: splitting lines, blank line appears in wrong place
+
+    Bug 273: format screws up file
+
+    Bug 277: numeric resolution before clean, N.NNNNNN &gt;10 digs after decimal corrupts file
+
+</pre>
+		<h4><a name="b104"></a>Fixed in Build 104</h4>
+		<pre>
+    Bug 23: index fields corresponding to faces in coordIndex, with extra values at end not cleaned
+
+    Bug 204: chisel window size seems to grow vertically
+
+    Bug 281: shift acts as space
+
+    Bug 282: make default error search look for errors
+
+    Bug 283: ElevationGridSplitter fails if ElevationGrid has a DEF
+
+    Bug 284: ElevationGridSplitter creates errors in some cases
+
+    Bug 285: PointSet and IndexedLineSet should warn if no emissiveColor
+
+    Bug 287: nonconformance should be PROTO definition, not instantiation
+
+    Bug 288: self ref USE into Script mistakenly reported as an error
+
+    Bug 289: need to see scene graph in vorlon
+
+    Bug 293: documentation doesn't describe elevation grid splitting options
+
+    Bug 294: USE at top level makes file unparseable
+
+    Bug 295: check version no longer works
+
+    Bug 296: exceptions reducing baxter humanoid
+
+</pre>
+		<h4><a name="b105"></a>Fixed in Build 105</h4>
+		<pre>
+    Bug 290: need elevation grid to ifs mutator
+
+    Bug 292: need support for splitting elevation grid with texture
+
+    Bug 297: fetch doesn't handle background urls
+
+    Bug 299: Elevation grid splitting labels, define it row by row
+
+    Bug 300: EV to IFS mutator
+
+    Bug 305: elevation grid splitter with texture, upside down if original has textureTransform scale 1 -1
+
+    Bug 309: after fetch, wrl file isn't opened
+
+    Bug 312: fetch referenced files doesn't retrieve image textures
+
+</pre>
+		<h4><a name="b106"></a>Fixed in Build 106 (Last Trapezium Inc. release)</h4>
+		<pre>
+    Bug 37: If a chisel produces errors, automatic clean should not occur
+
+    Bug 322: remove material node doesn't work sometimes
+
+    Bug 324: chisel reporting errors when none really exist in file (related to a PROTO)
+
+    Bug 325: chisel doesn't fetch some files
+</pre>
+		<h4><a name="b210"></a>Fixed in Build 210 "HVRC Edition" (Michael Louka)</h4>
+		<pre>
+    Bug 82: windows, chisel.exe needs icon
+
+    Bug 224: Unix jdk1.1.7 Linux on mac &amp; SGI exit after chiselling (can't reproduce)
+
+    Bug 237: evaluation doesn't find Chisel.key in chisel.jar
+
+    Bug 303: Improved documentation
+
+    Bug 320: chiseldoc.htm has broken graphics links
+
+    Bug 326: Simplify DEF Names chisel request
+
+    Other bugs were fixed that need to be compared with those registered in the old list</pre>
+
+<h4><a name="b211"></a>Fixed in Build 211</h4>
+<pre>    Bug 327: Remove splash screen as Chisel starts quickly on modern computers and the splash blocks the UI
+
+</pre>
+
+<h4><a name="b212"></a>Fixed in Build 212</h4>
+<pre>    Bug 168: serialized files not cleaned up on exit if more than one
+    
+    Bug 276: Chisel HTML report has bad html [BODY start tag was misplaced - fixed in html/HtmlGenerator.java and chisel/ProcessedFile.java]
+    
+<i>   </i> Bug 316: temp ser_files not removed on exit if multiple files opened [same as #168] </pre>
+
+
+<h4><a name="b213"></a>Fixed in Build 213</h4>
+<pre>
+    Bug 328: Join shapes by color does not preserve texture coordinates
+             (fix contributed by D.G. van der Laan)
+</pre>
+
+<h4><a name="b214"></a>Fixed in Build 214</h4>
+<pre>    Bug 329: DEF-ed Inlines containing one child which is also DEF-ed
+    resulted in a syntax error.
+    [Probably the same as Bug 189, but I've chosen a differnt resolution to the issue than the one suggested in the bug report. Bug 189: uninline file has single node DEF, need to remove DEF]
+    </pre>
+	</body>
+
+</PRE>
+
+</HTML>

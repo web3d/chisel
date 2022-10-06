@@ -1,0 +1,16 @@
+*.pyc
+*~
+*.o
+*.so
+*.bak
+*.os
+*.a
+*.ndb
+
+.DS_Store
+
+.svn
+.vscode
+
+*.zip
+*.log.txt

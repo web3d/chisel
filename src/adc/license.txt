@@ -1,0 +1,20 @@
+
+NON-COMMERCIAL SOURCE CODE LICENSE AGREEMENT FOR ARTHUR DO CONSULTING SOFTWARE
+
+1. Permission to use, copy, and distribute this software and its
+documentation for NON-COMMERCIAL purposes and without fee is hereby 
+granted provided that this copyright notice appears in all copies. 
+All distributions must provide the following attribution in both the
+ "about box" and in any  printed/online documentation: 
+ "This application uses HTML parsing technology from Arthur Do Consulting."
+
+LIMITATION OF LIABILITY. THE AUTHOR MAKES NO REPRESENTATIONS 
+OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, EITHER 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED 
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, 
+OR NON-INFRINGEMENT. THE AUTHOR SHALL NOT BE LIABLE FOR ANY 
+DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR
+DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES.
+
+Copyright (c) 1998 by Arthur Do <arthur@cs.stanford.edu>. 
+All Rights Reserved.
